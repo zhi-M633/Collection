@@ -1097,6 +1097,229 @@ textarea { resize: vertical; min-height: 80px; }
   color: var(--text-secondary);
 }
 
+/* ========== Notebook ========== */
+.notes-layout {
+  display: flex;
+  gap: 16px;
+  height: calc(100vh - 190px);
+  min-height: 480px;
+  max-height: 900px;
+}
+
+.notes-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.notes-search-input {
+  padding: 9px 12px;
+  font-size: 14px;
+  background: var(--bg-card);
+  flex-shrink: 0;
+}
+
+.notes-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.notes-toolbar .btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+}
+
+.notes-toolbar .btn-primary { color: #fff; }
+
+.notes-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  -webkit-overflow-scrolling: touch;
+}
+
+.notes-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.note-list-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition);
+  outline: none;
+}
+
+.note-list-item:last-child { border-bottom: none; }
+.note-list-item:hover { background: var(--bg-hover); }
+.note-list-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+.note-list-item.active {
+  background: var(--accent-light);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.note-list-item.trash-item { cursor: default; }
+
+.note-list-title {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-pin-mark { font-size: 11px; }
+
+.note-list-preview {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.note-list-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.note-trash-actions { display: flex; gap: 8px; }
+
+.note-mini-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.note-mini-btn:hover { text-decoration: underline; }
+.note-mini-btn.danger-text { color: var(--danger); }
+
+.notes-trash-global {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  background: var(--bg-secondary);
+}
+
+.note-editor-card {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.note-editor-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.note-editor-body { flex: 1; min-height: 0; flex-direction: column; }
+
+.note-editor-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.note-back-btn {
+  display: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 17px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#note-title-input {
+  flex: 1;
+  min-width: 160px;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 4px 0;
+  border-radius: 0;
+}
+
+#note-title-input:focus { box-shadow: none; border-color: transparent; }
+
+.note-editor-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.note-editor-actions .btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+#note-content-input {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 16px;
+  font-size: 15px;
+  line-height: 1.75;
+  resize: none;
+}
+
+#note-content-input:focus { box-shadow: none; }
+
+.note-editor-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+#note-save-status.save-error { color: var(--danger); }
+
 /* ========== Touch Device Optimizations ========== */
 @media (hover: none) {
   .card:hover { transform: none; box-shadow: var(--shadow); }
@@ -1108,6 +1331,8 @@ textarea { resize: vertical; min-height: 80px; }
   .search-result-item:hover { background: transparent; }
   .search-tag-hint:hover { background: transparent; }
   .tag-chip:hover { border-color: var(--border); color: var(--text-secondary); }
+  .note-list-item:hover { background: transparent; }
+  .note-list-item.active { background: var(--accent-light); }
 }
 
 /* ========== Responsive ========== */
@@ -1174,6 +1399,19 @@ textarea { resize: vertical; min-height: 80px; }
   .cover-input-group { flex-wrap: wrap; }
   .cover-input-group input[type="text"] { min-width: 0; }
   .cover-file-btn { width: 100%; text-align: center; justify-content: center; }
+  .notes-layout { display: block; height: auto; min-height: 0; max-height: none; }
+  .notes-sidebar { width: 100%; }
+  .notes-list { flex: 0 1 auto; max-height: calc(100dvh - 260px); min-height: 280px; }
+  .note-editor-card { display: none; height: calc(100dvh - 190px); min-height: 360px; }
+  #section-notes.mobile-editing .notes-sidebar { display: none; }
+  #section-notes.mobile-editing .note-editor-card { display: flex; }
+  .note-back-btn { display: flex; }
+  .note-editor-head { padding: 10px 12px; gap: 8px; }
+  #note-title-input { font-size: 16px; min-width: 0; flex-basis: calc(100% - 44px); }
+  .note-editor-actions { width: 100%; }
+  .note-editor-actions .btn { flex: 1; text-align: center; padding: 7px 6px; }
+  #note-content-input { padding: 12px; font-size: 15px; }
+  .note-editor-footer { padding: 8px 12px; }
 }
 
 /* Sidebar toggle button - desktop hidden */
@@ -1215,6 +1453,7 @@ textarea { resize: vertical; min-height: 80px; }
     <button class="tab-btn" data-section="musicals">🎭 音乐剧 <span class="tab-count" id="count-musicals">0</span></button>
     <button class="tab-btn" data-section="fanfiction">💕 同人文 <span class="tab-count" id="count-fanfiction">0</span></button>
     <button class="tab-btn" data-section="webnovels">📖 网文漫画 <span class="tab-count" id="count-webnovels">0</span></button>
+    <button class="tab-btn" data-section="notes">📝 笔记本 <span class="tab-count" id="count-notes">0</span></button>
   </div>
 </nav>
 
@@ -1331,6 +1570,42 @@ textarea { resize: vertical; min-height: 80px; }
       </aside>
       <div class="content-area">
         <div class="cards-grid" id="grid-webnovels"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notebook Section -->
+  <div class="section" id="section-notes" data-section="notes">
+    <div class="notes-layout">
+      <aside class="notes-sidebar">
+        <input type="text" class="notes-search-input" id="notes-search" placeholder="搜索草稿标题或正文..." maxlength="100" oninput="onNotesSearchInput(this.value)">
+        <div class="notes-toolbar">
+          <button class="btn btn-primary btn-small" onclick="startNewNote()">＋ 新建草稿</button>
+          <button class="btn btn-secondary btn-small" id="notes-trash-toggle" onclick="toggleNotesTrash()">🗑 回收站</button>
+        </div>
+        <div class="notes-list" id="notes-list"></div>
+      </aside>
+      <div class="note-editor-card" id="note-editor-card">
+        <div class="note-editor-empty" id="note-editor-empty">选择一篇草稿，或点击“新建草稿”开始写</div>
+        <div class="note-editor-body" id="note-editor-body" style="display:none;">
+          <div class="note-editor-head">
+            <button class="note-back-btn" onclick="closeNoteEditorMobile()" title="返回草稿列表" aria-label="返回草稿列表">←</button>
+            <input type="text" id="note-title-input" placeholder="草稿标题" maxlength="120"
+                   oninput="onNoteTitleInput()" oncompositionstart="noteCompositionStart()" oncompositionend="noteCompositionEnd()">
+            <div class="note-editor-actions">
+              <button class="btn btn-secondary btn-small" id="note-pin-btn" onclick="toggleCurrentNotePin()" title="置顶草稿">📌 置顶</button>
+              <button class="btn btn-secondary btn-small" onclick="copyCurrentNote()" title="复制标题和正文">复制</button>
+              <button class="btn btn-secondary btn-small" onclick="exportCurrentNote()" title="导出为 TXT 文件">导出</button>
+              <button class="btn btn-secondary btn-small danger-text" onclick="trashCurrentNote()" title="移入回收站，保留 30 天">删除</button>
+            </div>
+          </div>
+          <textarea id="note-content-input" placeholder="在这里写草稿..." maxlength="100000"
+                    oninput="onNoteContentInput(event)" oncompositionstart="noteCompositionStart()" oncompositionend="noteCompositionEnd()"></textarea>
+          <div class="note-editor-footer">
+            <span id="note-save-status">未保存</span>
+            <span id="note-word-count">0 字</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1499,9 +1774,10 @@ textarea { resize: vertical; min-height: 80px; }
         <div class="privacy-box">
           <p><strong>授权后会发生：</strong></p>
           <ul>
-            <li>从你的 Supabase 云端账号读取作品数据，并按更新时间合并到本机。</li>
+            <li>从你的 Supabase 云端账号读取作品与草稿数据，并按更新时间合并到本机。</li>
             <li>将本机的作品名称、作者/导演、国家/地区、评分、评价、介绍、两套标签、封面图片和删除记录上传。</li>
-            <li>作品数据中不包含：本机作者输入历史、TMDB Key、主题偏好。同步请求本身仍会向你的 Supabase 项目暴露 IP 和常规请求信息。</li>
+            <li>将笔记本中的草稿标题、正文、置顶标记、回收站状态和彻底删除记录上传。</li>
+            <li>以上数据中不包含：本机作者输入历史、TMDB Key、主题偏好。同步请求本身仍会向你的 Supabase 项目暴露 IP 和常规请求信息。</li>
           </ul>
           <p>云端由你自己的 Supabase 项目托管，行级权限（RLS）确保只有你的账号能读写；传输使用 HTTPS。当前未启用端到端加密，Supabase 作为服务方技术上可访问存储内容。</p>
         </div>
@@ -1573,9 +1849,9 @@ textarea { resize: vertical; min-height: 80px; }
       <h2>切换账号确认</h2>
     </div>
     <div class="modal-body">
-      <p style="font-size:14px;line-height:1.7;margin-bottom:10px;">你正在登录另一个账号。本机现有 <strong id="switch-local-count">0</strong> 条作品记录。</p>
+      <p style="font-size:14px;line-height:1.7;margin-bottom:10px;">你正在登录另一个账号。本机现有 <strong id="switch-local-count">0</strong> 条作品/草稿记录。</p>
       <div class="privacy-box">
-        <p>继续切换会清空本机数据；旧账号的云端数据不会被删除。为了不丢失尚未同步的内容，建议先导出备份。</p>
+        <p>继续切换会清空本机数据（包括笔记本中的草稿）；旧账号的云端数据不会被删除。为了不丢失尚未同步的内容，建议先导出备份。</p>
       </div>
       <div class="settings-actions">
         <button class="btn btn-primary modal-btn" onclick="switchAccountWithBackup()">导出备份并继续</button>
@@ -1690,6 +1966,9 @@ textarea { resize: vertical; min-height: 80px; }
 
 // ========== Constants ==========
 const SECTIONS = ['movies', 'books', 'musicals', 'fanfiction', 'webnovels'];
+const NOTEBOOK_SECTION = 'notes';
+// 笔记本与作品共用快照/合并/备份逻辑，但不参与标签系统
+const SYNC_SECTIONS = [...SECTIONS, NOTEBOOK_SECTION];
 const SECTION_LABELS = { movies: '电影', books: '书本', musicals: '音乐剧', fanfiction: '同人文', webnovels: '网文漫画' };
 const SECTION_ICONS = { movies: '🎬', books: '📚', musicals: '🎭', fanfiction: '💕', webnovels: '📖' };
 const SECTION_AUTHOR_LABELS = { movies: '导演', books: '作者', musicals: '', fanfiction: '大大', webnovels: '作者' };
@@ -1712,6 +1991,18 @@ let authBusy = false;
 let storageWriteFailed = false;
 let storageErrorUntil = 0;
 
+// ========== 笔记本状态 ==========
+let currentNoteId = null;
+let noteIsDraft = false;
+let noteDirty = false;
+let noteComposing = false;
+let noteSaveTimer = null;
+let notesTrashMode = false;
+let noteSearchQuery = '';
+let noteSearchTimer = null;
+let noteLastSavedAt = 0;
+let notesInitialized = false;
+
 // ========== 作者自动推荐状态 ==========
 let authorSearchDebounceTimer = null;
 let authorSuggestionCache = new Map(); // {section: Set of known authors}
@@ -1727,13 +2018,16 @@ const SUPABASE_CONFIGURED =
   !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.includes('YOUR-ANON');
 
 // ========== 隐私 / 备份常量 ==========
-const CLOUD_CONSENT_VERSION = 1;
+// 上传范围新增草稿后必须重新取得同意，版本号 +1 会让旧授权失效
+const CLOUD_CONSENT_VERSION = 2;
 const EXTERNAL_LOOKUP_KEY = 'external_author_lookup_v1';
 const LAST_BACKUP_KEY = 'last_backup_time';
 const BACKUP_FORMAT = 'works-collection-backup';
-const BACKUP_VERSION = 1;
+const BACKUP_VERSION = 2;
 const MAX_BACKUP_FILE_BYTES = 10 * 1024 * 1024;
 const TOMBSTONE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+const NOTE_TRASH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const NOTE_MAX_CONTENT = 100000;
 
 // ========== Sync State ==========
 let supabaseClient = null;
@@ -1820,11 +2114,13 @@ function clearLocalCollections() {
     localStorage.removeItem(`tags_${s}`);
     localStorage.removeItem(`tags_updated_${s}`);
   });
+  localStorage.removeItem(`collect_${NOTEBOOK_SECTION}`);
   localStorage.removeItem('collect_deleted');
 }
 
 function totalLocalItemCount() {
-  return SECTIONS.reduce((sum, s) => sum + getData(s).length, 0);
+  return SECTIONS.reduce((sum, s) => sum + getData(s).length, 0) +
+    getNotes().length;
 }
 
 function hasLocalData() {
@@ -1860,7 +2156,7 @@ function updateStorageMeta() {
   }
   const usageEl = document.getElementById('local-storage-usage');
   if (usageEl) {
-    usageEl.textContent = '本机作品数据约 ' + formatBytes(estimateLocalStorageUsage()) +
+    usageEl.textContent = '本机作品与草稿数据约 ' + formatBytes(estimateLocalStorageUsage()) +
       '（浏览器通常上限约 5 MB）';
   }
 }
@@ -2018,6 +2314,7 @@ function switchAccountWithBackup() {
   clearTimeout(syncTimer);
   clearTimeout(pullTimer);
   clearLocalCollections();
+  resetNotesState();
   activeTagFilter = {};
   currentTagSection = null;
   currentEditId = null;
@@ -2475,7 +2772,7 @@ function stableStringify(value) {
 // 合并结果才能做到幂等（否则每次拉取云端都会多推一次）
 function computeLastModified(snapshot) {
   let ts = 0;
-  SECTIONS.forEach(s => {
+  SYNC_SECTIONS.forEach(s => {
     (snapshot[`collect_${s}`] || []).forEach(item => {
       ts = Math.max(ts, item.updatedAt || 0, item.createdAt || 0);
     });
@@ -2509,10 +2806,8 @@ function buildLocalSnapshot() {
   const allDeleted = getDeletedMap();
   const snapshot = { _lastModified: 0, _tagsUpdatedAt: {}, _deleted: {} };
 
-  SECTIONS.forEach(s => {
+  SYNC_SECTIONS.forEach(s => {
     snapshot[`collect_${s}`] = sortItemsForSync(getData(s));
-    snapshot[`tags_${s}`] = getTags(s);
-    snapshot._tagsUpdatedAt[s] = getTagsUpdatedAt(s);
 
     const deleted = allDeleted[s] || {};
     const pruned = {};
@@ -2523,6 +2818,11 @@ function buildLocalSnapshot() {
     snapshot._deleted[s] = pruned;
   });
 
+  SECTIONS.forEach(s => {
+    snapshot[`tags_${s}`] = getTags(s);
+    snapshot._tagsUpdatedAt[s] = getTagsUpdatedAt(s);
+  });
+
   snapshot._lastModified = computeLastModified(snapshot);
   return snapshot;
 }
@@ -2530,7 +2830,7 @@ function buildLocalSnapshot() {
 function mergeSnapshots(local, cloud) {
   const merged = { _lastModified: 0, _tagsUpdatedAt: {}, _deleted: {} };
 
-  SECTIONS.forEach(s => {
+  SYNC_SECTIONS.forEach(s => {
     const localItems = Array.isArray(local?.[`collect_${s}`]) ? local[`collect_${s}`] : [];
     const cloudItems = Array.isArray(cloud?.[`collect_${s}`]) ? cloud[`collect_${s}`] : [];
 
@@ -2566,7 +2866,9 @@ function mergeSnapshots(local, cloud) {
         (item.updatedAt || 0) > (deleted[item.id] || 0)
       )
     );
+  });
 
+  SECTIONS.forEach(s => {
     // 标签列表整体按时间戳取较新的一方；时间相同则取确定性的并集
     const localTags = Array.isArray(local?.[`tags_${s}`]) ? local[`tags_${s}`] : [];
     const cloudTags = Array.isArray(cloud?.[`tags_${s}`]) ? cloud[`tags_${s}`] : [];
@@ -2593,14 +2895,16 @@ function applySnapshotToLocal(snapshot) {
   if (!snapshot) return false;
   let changed = false;
 
-  SECTIONS.forEach(s => {
+  SYNC_SECTIONS.forEach(s => {
     const items = Array.isArray(snapshot[`collect_${s}`])
       ? sortItemsForSync(snapshot[`collect_${s}`])
       : null;
     if (items && JSON.stringify(items) !== JSON.stringify(getData(s))) {
       if (safeSetItem(`collect_${s}`, JSON.stringify(items))) changed = true;
     }
+  });
 
+  SECTIONS.forEach(s => {
     const tags = snapshot[`tags_${s}`];
     if (Array.isArray(tags) && JSON.stringify(tags) !== JSON.stringify(getTags(s))) {
       if (safeSetItem(`tags_${s}`, JSON.stringify(tags))) changed = true;
@@ -2614,7 +2918,7 @@ function applySnapshotToLocal(snapshot) {
   if (snapshot._deleted) {
     const all = getDeletedMap();
     const cutoff = Date.now() - TOMBSTONE_TTL_MS;
-    SECTIONS.forEach(s => {
+    SYNC_SECTIONS.forEach(s => {
       const incoming = snapshot._deleted[s] || {};
       const current = { ...(all[s] || {}) };
       Object.keys(incoming).forEach(id => {
@@ -2633,9 +2937,640 @@ function applySnapshotToLocal(snapshot) {
 
 function renderAllSections() {
   SECTIONS.forEach(s => renderSection(s));
+  renderNotesPanel();
   if (currentTagSection && document.getElementById('tagModal')?.classList.contains('show')) {
     renderTagModalList();
   }
+}
+
+// ========== 笔记本 ==========
+// 草稿与作品共用 collect_* / 快照 / 合并逻辑，但 UI 单独实现：
+// 自动保存到本机，删除先进 30 天回收站，彻底删除才写墓碑。
+function getNotes() {
+  const raw = getData(NOTEBOOK_SECTION);
+  return raw
+    .filter(n => n && typeof n === 'object' && typeof n.id === 'string' && n.id)
+    .map(n => ({
+      id: n.id,
+      title: typeof n.title === 'string' ? n.title : '',
+      content: typeof n.content === 'string' ? n.content : '',
+      pinned: !!n.pinned,
+      createdAt: Number(n.createdAt) || 0,
+      updatedAt: Number(n.updatedAt) || 0,
+      trashedAt: Number(n.trashedAt) || 0
+    }));
+}
+
+function saveNotes(notes) {
+  return setData(NOTEBOOK_SECTION, notes);
+}
+
+function getNoteById(id) {
+  return getNotes().find(n => n.id === id) || null;
+}
+
+function noteDisplayTitle(note) {
+  return String(note?.title || '').trim() || '无标题草稿';
+}
+
+function notePreview(content) {
+  return String(content || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+}
+
+function noteWordCount(text) {
+  return String(text || '').replace(/\s/g, '').length;
+}
+
+function formatNoteTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  if (d.toDateString() === now.toDateString()) {
+    return `今天 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (d.toDateString() === yesterday.toDateString()) {
+    return `昨天 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  if (d.getFullYear() === now.getFullYear()) {
+    return `${d.getMonth() + 1}月${d.getDate()}日`;
+  }
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+}
+
+function renderNotesPanel() {
+  updateCounts();
+  renderNotesList();
+  renderNotesEditorState();
+}
+
+function renderNotesList() {
+  const list = document.getElementById('notes-list');
+  if (!list) return;
+
+  const all = getNotes();
+  const activeCount = all.filter(n => !n.trashedAt).length;
+  const countEl = document.getElementById('count-notes');
+  if (countEl) countEl.textContent = activeCount;
+  const trashCount = all.filter(n => n.trashedAt).length;
+  const toggle = document.getElementById('notes-trash-toggle');
+  if (toggle) {
+    toggle.textContent = notesTrashMode ? '← 返回草稿' : (trashCount ? `🗑 回收站 ${trashCount}` : '🗑 回收站');
+    toggle.classList.toggle('btn-primary', notesTrashMode);
+    toggle.classList.toggle('btn-secondary', !notesTrashMode);
+  }
+
+  const search = document.getElementById('notes-search');
+  if (search) {
+    search.disabled = notesTrashMode;
+    search.placeholder = notesTrashMode ? '回收站中的草稿' : '搜索草稿标题或正文...';
+    if (notesTrashMode && search.value) search.value = '';
+  }
+
+  let items;
+  if (notesTrashMode) {
+    items = all.filter(n => n.trashedAt).sort((a, b) => b.trashedAt - a.trashedAt);
+  } else {
+    const q = noteSearchQuery.trim().toLowerCase();
+    items = all.filter(n => {
+      if (n.trashedAt) return false;
+      if (!q) return true;
+      return n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q);
+    }).sort((a, b) => {
+      if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+      return b.updatedAt - a.updatedAt;
+    });
+  }
+
+  if (!items.length) {
+    const emptyText = notesTrashMode
+      ? '回收站是空的'
+      : (noteSearchQuery.trim() ? '没有找到匹配的草稿' : '还没有草稿，点击“新建草稿”开始写');
+    list.innerHTML = `<div class="notes-empty">${escapeHtml(emptyText)}</div>`;
+    return;
+  }
+
+  let html = '';
+  if (notesTrashMode) {
+    html += `<div class="notes-trash-global">
+      <button class="btn btn-secondary btn-small danger-text" onclick="emptyNotesTrash()">清空回收站</button>
+    </div>`;
+  }
+
+  items.forEach(n => {
+    if (notesTrashMode) {
+      const remain = Math.max(0, Math.ceil((n.trashedAt + NOTE_TRASH_TTL_MS - Date.now()) / 86400000));
+      html += `<div class="note-list-item trash-item">
+        <div class="note-list-title">${escapeHtml(noteDisplayTitle(n))}</div>
+        <div class="note-list-preview">${escapeHtml(notePreview(n.content) || '（空白草稿）')}</div>
+        <div class="note-list-meta">
+          <span>剩余 ${remain} 天</span>
+          <span class="note-trash-actions">
+            <button class="note-mini-btn" onclick="${onclickAttr('restoreNote', n.id)}">恢复</button>
+            <button class="note-mini-btn danger-text" onclick="${onclickAttr('permanentlyDeleteNote', n.id)}">彻底删除</button>
+          </span>
+        </div>
+      </div>`;
+      return;
+    }
+
+    const active = n.id === currentNoteId ? ' active' : '';
+    const openCall = `openNote(${JSON.stringify(n.id)})`;
+    const keyHandler = escapeHtml(
+      `if(event.key==='Enter'||event.key===' '){event.preventDefault();${openCall}}`
+    );
+    html += `<div class="note-list-item${active}" tabindex="0" role="button"
+        onclick="${onclickAttr('openNote', n.id)}" onkeydown="${keyHandler}">
+      <div class="note-list-title">${n.pinned ? '<span class="note-pin-mark" title="已置顶">📌</span> ' : ''}${escapeHtml(noteDisplayTitle(n))}</div>
+      <div class="note-list-preview">${escapeHtml(notePreview(n.content) || '（空白草稿）')}</div>
+      <div class="note-list-meta">
+        <span>${escapeHtml(formatNoteTime(n.updatedAt))}</span>
+        <span>${noteWordCount(n.content)} 字</span>
+      </div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+function setNoteEditorVisible(visible) {
+  const body = document.getElementById('note-editor-body');
+  const empty = document.getElementById('note-editor-empty');
+  if (body) body.style.display = visible ? 'flex' : 'none';
+  if (empty) {
+    empty.style.display = visible ? 'none' : 'flex';
+    if (!visible) {
+      empty.textContent = notesTrashMode
+        ? '回收站中的草稿不能编辑；可以恢复或彻底删除'
+        : '选择一篇草稿，或点击“新建草稿”开始写';
+    }
+  }
+  document.getElementById('section-notes')?.classList.toggle('mobile-editing', visible);
+}
+
+function renderNotesEditorState() {
+  if (notesTrashMode) { setNoteEditorVisible(false); return; }
+  if (!currentNoteId) { setNoteEditorVisible(false); return; }
+  if (noteIsDraft) return;
+
+  const note = getNoteById(currentNoteId);
+  const titleEl = document.getElementById('note-title-input');
+  const contentEl = document.getElementById('note-content-input');
+  if (!titleEl || !contentEl) return;
+
+  if (!note || note.trashedAt) {
+    const focused = document.activeElement === titleEl || document.activeElement === contentEl;
+    if (noteDirty || focused) {
+      updateNoteSaveStatus('这篇草稿已在其他设备被删除或移入回收站');
+      return;
+    }
+    closeNoteEditor();
+    return;
+  }
+
+  if (titleEl.value !== note.title || contentEl.value !== note.content) {
+    const focused = document.activeElement === titleEl || document.activeElement === contentEl;
+    if (noteDirty || focused) {
+      updateNoteSaveStatus('云端版本与编辑器不同，切换草稿后更新');
+    } else {
+      titleEl.value = note.title;
+      contentEl.value = note.content;
+      noteLastSavedAt = note.updatedAt;
+      noteDirty = false;
+      updateNoteWordCount();
+      updateNoteSaveStatus(noteLastSavedAt ? '已保存 ' + timeHHMM(noteLastSavedAt) : '未保存');
+    }
+  }
+  updateNotePinButton(!!note.pinned);
+}
+
+function timeHHMM(ts) {
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function updateNoteWordCount() {
+  const el = document.getElementById('note-word-count');
+  const contentEl = document.getElementById('note-content-input');
+  if (!el || !contentEl) return;
+  el.textContent = noteWordCount(contentEl.value) + ' 字';
+}
+
+function updateNoteSaveStatus(text, isError = false) {
+  const el = document.getElementById('note-save-status');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle('save-error', !!isError);
+}
+
+function updateNotePinButton(pinned) {
+  const btn = document.getElementById('note-pin-btn');
+  if (!btn) return;
+  btn.textContent = pinned ? '📌 取消置顶' : '📌 置顶';
+  btn.title = pinned ? '取消置顶' : '置顶草稿';
+}
+
+function fillNoteEditor(note) {
+  const titleEl = document.getElementById('note-title-input');
+  const contentEl = document.getElementById('note-content-input');
+  if (titleEl) titleEl.value = note.title || '';
+  if (contentEl) contentEl.value = note.content || '';
+  updateNotePinButton(!!note.pinned);
+  updateNoteWordCount();
+}
+
+function onNotesSearchInput(value) {
+  noteSearchQuery = String(value || '').slice(0, 100);
+  clearTimeout(noteSearchTimer);
+  noteSearchTimer = setTimeout(renderNotesList, 180);
+}
+
+function openNote(id) {
+  if (notesTrashMode) return;
+  const note = getNoteById(id);
+  if (!note || note.trashedAt) return;
+  if (currentNoteId !== id) flushNoteEditor();
+
+  currentNoteId = id;
+  noteIsDraft = false;
+  noteDirty = false;
+  noteLastSavedAt = note.updatedAt;
+  fillNoteEditor(note);
+  setNoteEditorVisible(true);
+  updateNoteSaveStatus(noteLastSavedAt ? '已保存 ' + timeHHMM(noteLastSavedAt) : '未保存');
+  renderNotesList();
+}
+
+function startNewNote() {
+  flushNoteEditor();
+  notesTrashMode = false;
+  currentNoteId = uuid();
+  noteIsDraft = true;
+  noteDirty = false;
+  noteLastSavedAt = 0;
+  fillNoteEditor({ title: '', content: '', pinned: false });
+  setNoteEditorVisible(true);
+  updateNoteSaveStatus('新草稿');
+  renderNotesList();
+  document.getElementById('note-title-input')?.focus();
+}
+
+function closeNoteEditor() {
+  clearTimeout(noteSaveTimer);
+  currentNoteId = null;
+  noteIsDraft = false;
+  noteDirty = false;
+  setNoteEditorVisible(false);
+  renderNotesList();
+}
+
+function resetNotesState() {
+  clearTimeout(noteSaveTimer);
+  clearTimeout(noteSearchTimer);
+  currentNoteId = null;
+  noteIsDraft = false;
+  noteDirty = false;
+  noteComposing = false;
+  noteLastSavedAt = 0;
+  notesTrashMode = false;
+  noteSearchQuery = '';
+  const search = document.getElementById('notes-search');
+  if (search) search.value = '';
+  setNoteEditorVisible(false);
+}
+
+function closeNoteEditorMobile() {
+  flushNoteEditor();
+  document.getElementById('section-notes')?.classList.remove('mobile-editing');
+}
+
+function onNoteTitleInput() {
+  if (!currentNoteId || notesTrashMode) return;
+  noteDirty = true;
+  updateNoteSaveStatus('未保存');
+  if (!noteComposing) scheduleNoteSave();
+}
+
+function onNoteContentInput(event) {
+  if (!currentNoteId || notesTrashMode) return;
+  noteDirty = true;
+  updateNoteWordCount();
+  updateNoteSaveStatus('未保存');
+  if (!noteComposing && !event?.isComposing) scheduleNoteSave();
+}
+
+function noteCompositionStart() {
+  noteComposing = true;
+}
+
+function noteCompositionEnd() {
+  noteComposing = false;
+  if (noteDirty) scheduleNoteSave();
+}
+
+function scheduleNoteSave() {
+  clearTimeout(noteSaveTimer);
+  noteSaveTimer = setTimeout(() => saveCurrentNote(), 700);
+}
+
+function saveCurrentNote() {
+  clearTimeout(noteSaveTimer);
+  if (!currentNoteId || notesTrashMode) return true;
+  if (noteComposing) return false;
+
+  const titleEl = document.getElementById('note-title-input');
+  const contentEl = document.getElementById('note-content-input');
+  if (!titleEl || !contentEl) return false;
+
+  const title = titleEl.value.slice(0, 120).trim();
+  const content = contentEl.value.slice(0, NOTE_MAX_CONTENT);
+
+  if (noteIsDraft) {
+    if (!title && !content.trim()) {
+      updateNoteSaveStatus('新草稿');
+      return true;
+    }
+    const now = Date.now();
+    const notes = getNotes();
+    notes.push({
+      id: currentNoteId,
+      title,
+      content,
+      pinned: false,
+      createdAt: now,
+      updatedAt: now,
+      trashedAt: 0
+    });
+    if (!saveNotes(notes)) {
+      updateNoteSaveStatus('本机存储空间不足，草稿未保存', true);
+      return false;
+    }
+    noteIsDraft = false;
+  } else {
+    const notes = getNotes();
+    const idx = notes.findIndex(n => n.id === currentNoteId);
+    if (idx === -1) {
+      const now = Date.now();
+      notes.push({
+        id: currentNoteId,
+        title,
+        content,
+        pinned: false,
+        createdAt: noteLastSavedAt || now,
+        updatedAt: now,
+        trashedAt: 0
+      });
+    } else {
+      const note = notes[idx];
+      if (note.title === title && note.content === content) {
+        noteDirty = false;
+        updateNoteSaveStatus(noteLastSavedAt ? '已保存 ' + timeHHMM(noteLastSavedAt) : '已保存');
+        return true;
+      }
+      note.title = title;
+      note.content = content;
+      note.updatedAt = Date.now();
+      note.trashedAt = 0;
+    }
+    if (!saveNotes(notes)) {
+      updateNoteSaveStatus('本机存储空间不足，草稿未保存', true);
+      return false;
+    }
+  }
+
+  noteDirty = false;
+  noteLastSavedAt = Date.now();
+  updateNoteSaveStatus('已保存 ' + timeHHMM(noteLastSavedAt));
+  updateNoteWordCount();
+  renderNotesList();
+  // 打字期间的保存合并成较长的云端防抖，避免频繁上传
+  scheduleCloudSync(4000);
+  return true;
+}
+
+function flushNoteEditor(force = false) {
+  if (!currentNoteId || notesTrashMode) return true;
+  if (!noteDirty && !noteIsDraft) return true;
+  if (noteComposing && !force) return false;
+  if (force) noteComposing = false;
+  return saveCurrentNote();
+}
+
+function toggleCurrentNotePin() {
+  if (!currentNoteId || notesTrashMode) return;
+  if (noteIsDraft) {
+    const title = document.getElementById('note-title-input')?.value || '';
+    const content = document.getElementById('note-content-input')?.value || '';
+    if (!title.trim() && !content.trim()) {
+      showToast('空白草稿不能置顶');
+      return;
+    }
+    if (!saveCurrentNote()) return;
+  }
+  const notes = getNotes();
+  const note = notes.find(n => n.id === currentNoteId);
+  if (!note) return;
+  note.pinned = !note.pinned;
+  note.updatedAt = Date.now();
+  if (!saveNotes(notes)) {
+    showToast('保存失败，请检查本机存储空间');
+    return;
+  }
+  noteLastSavedAt = note.updatedAt;
+  updateNotePinButton(note.pinned);
+  updateNoteSaveStatus('已保存 ' + timeHHMM(noteLastSavedAt));
+  renderNotesList();
+  showToast(note.pinned ? '草稿已置顶' : '已取消置顶');
+}
+
+function toggleNotesTrash() {
+  flushNoteEditor();
+  notesTrashMode = !notesTrashMode;
+  noteSearchQuery = '';
+  const search = document.getElementById('notes-search');
+  if (search) search.value = '';
+  if (notesTrashMode) {
+    closeNoteEditor();
+    purgeExpiredNotes(true);
+  }
+  renderNotesPanel();
+}
+
+function recordNoteTombstones(ids) {
+  if (!ids.length) return true;
+  const all = getDeletedMap();
+  all[NOTEBOOK_SECTION] = all[NOTEBOOK_SECTION] || {};
+  const now = Date.now();
+  ids.forEach(id => {
+    all[NOTEBOOK_SECTION][id] = Math.max(all[NOTEBOOK_SECTION][id] || 0, now);
+  });
+  return safeSetItem('collect_deleted', JSON.stringify(all));
+}
+
+function purgeExpiredNotes(showMessage) {
+  const cutoff = Date.now() - NOTE_TRASH_TTL_MS;
+  const notes = getNotes();
+  const expired = notes.filter(n => n.trashedAt && n.trashedAt < cutoff);
+  if (!expired.length) return 0;
+  if (!recordNoteTombstones(expired.map(n => n.id))) return 0;
+  if (!saveNotes(notes.filter(n => !n.trashedAt || n.trashedAt >= cutoff))) return 0;
+  if (currentNoteId && expired.some(n => n.id === currentNoteId)) closeNoteEditor();
+  if (showMessage) showToast(`已自动清除 ${expired.length} 篇超过 30 天的回收站草稿`);
+  return expired.length;
+}
+
+function trashCurrentNote() {
+  if (!currentNoteId || notesTrashMode) return;
+  if (noteIsDraft) {
+    const title = document.getElementById('note-title-input')?.value || '';
+    const content = document.getElementById('note-content-input')?.value || '';
+    if (!title.trim() && !content.trim()) {
+      closeNoteEditor();
+      return;
+    }
+    if (!saveCurrentNote()) return;
+  }
+
+  const notes = getNotes();
+  const idx = notes.findIndex(n => n.id === currentNoteId);
+  if (idx === -1) { closeNoteEditor(); return; }
+  const note = notes[idx];
+  if (!confirm(`将“${noteDisplayTitle(note)}”移入回收站？30 天后自动清除。`)) return;
+
+  note.trashedAt = Date.now();
+  note.updatedAt = note.trashedAt;
+  note.pinned = false;
+  if (!saveNotes(notes)) {
+    showToast('保存失败，草稿未删除');
+    return;
+  }
+  closeNoteEditor();
+  renderNotesPanel();
+  showToast('已移入回收站，保留 30 天');
+}
+
+function restoreNote(id) {
+  const notes = getNotes();
+  const note = notes.find(n => n.id === id);
+  if (!note || !note.trashedAt) return;
+  note.trashedAt = 0;
+  note.updatedAt = Date.now();
+  if (!saveNotes(notes)) {
+    showToast('恢复失败，请检查本机存储空间');
+    return;
+  }
+  renderNotesPanel();
+  showToast('草稿已恢复');
+}
+
+function permanentlyDeleteNote(id) {
+  const note = getNoteById(id);
+  if (!note) return;
+  if (!confirm(`彻底删除“${noteDisplayTitle(note)}”？此操作无法恢复。`)) return;
+  if (!recordNoteTombstones([id])) {
+    showToast('删除记录未能保存，请检查本机存储空间');
+    return;
+  }
+  if (!saveNotes(getNotes().filter(n => n.id !== id))) {
+    showToast('删除失败，请重试');
+    return;
+  }
+  if (currentNoteId === id) closeNoteEditor();
+  renderNotesPanel();
+  showToast('草稿已彻底删除');
+}
+
+function emptyNotesTrash() {
+  const trashed = getNotes().filter(n => n.trashedAt);
+  if (!trashed.length) {
+    showToast('回收站是空的');
+    return;
+  }
+  if (!confirm(`彻底删除回收站中的 ${trashed.length} 篇草稿？此操作无法恢复。`)) return;
+  if (!recordNoteTombstones(trashed.map(n => n.id))) {
+    showToast('删除记录未能保存，请检查本机存储空间');
+    return;
+  }
+  if (!saveNotes(getNotes().filter(n => !n.trashedAt))) {
+    showToast('清空失败，请重试');
+    return;
+  }
+  renderNotesPanel();
+  showToast('回收站已清空');
+}
+
+function noteEditorText() {
+  const title = document.getElementById('note-title-input')?.value || '';
+  const content = document.getElementById('note-content-input')?.value || '';
+  return { title, content };
+}
+
+async function copyCurrentNote() {
+  if (!currentNoteId || notesTrashMode) return;
+  const { title, content } = noteEditorText();
+  const text = [title.trim(), content].filter(Boolean).join('\n\n');
+  if (!text.trim()) {
+    showToast('草稿是空的，没有可复制的内容');
+    return;
+  }
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable');
+    await navigator.clipboard.writeText(text);
+    showToast('草稿已复制');
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch {}
+    ta.remove();
+    showToast(ok ? '草稿已复制' : '复制失败，请手动选择文本');
+  }
+}
+
+function noteExportFilename(title) {
+  const base = String(title || '').replace(/[\\/:*?"<>|\r\n]/g, '_').trim().slice(0, 40);
+  return (base || '未命名草稿') + '.txt';
+}
+
+function exportCurrentNote() {
+  if (!currentNoteId || notesTrashMode) return;
+  flushNoteEditor();
+  const { title, content } = noteEditorText();
+  if (!title.trim() && !content.trim()) {
+    showToast('草稿是空的，没有可导出的内容');
+    return;
+  }
+  const text = [title.trim(), content].filter(Boolean).join('\n\n');
+  downloadText(noteExportFilename(title), text, 'text/plain;charset=utf-8');
+  showToast('草稿已导出为 TXT');
+}
+
+function initNotes() {
+  if (notesInitialized) { renderNotesPanel(); return; }
+  notesInitialized = true;
+
+  window.addEventListener('pagehide', () => flushNoteEditor(true));
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushNoteEditor(true);
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey &&
+        e.key.toLowerCase() === 's' && currentSection === NOTEBOOK_SECTION &&
+        currentNoteId && !notesTrashMode) {
+      e.preventDefault();
+      if (flushNoteEditor()) showToast('草稿已保存');
+      else if (noteComposing) showToast('正在输入，稍后自动保存');
+    }
+  });
+
+  purgeExpiredNotes(true);
+  renderNotesPanel();
 }
 
 // ========== 本机备份与导入 ==========
@@ -2713,6 +3648,43 @@ function sanitizeBackupItem(raw) {
   };
 }
 
+function sanitizeBackupNote(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const title = sanitizeString(raw.title, 120).trim();
+  const content = sanitizeString(raw.content, NOTE_MAX_CONTENT);
+  if (!title && !content.trim()) return null;
+
+  let id = sanitizeString(raw.id, 100).trim();
+  if (!/^[A-Za-z0-9_-]{4,100}$/.test(id)) id = uuid();
+
+  const createdAt = sanitizeTimestamp(raw.createdAt) ||
+    sanitizeTimestamp(raw.updatedAt) || Date.now();
+  const updatedAt = sanitizeTimestamp(raw.updatedAt) || createdAt;
+  const trashedAt = sanitizeTimestamp(raw.trashedAt);
+
+  return {
+    id,
+    title,
+    content,
+    pinned: raw.pinned === true,
+    createdAt,
+    updatedAt,
+    trashedAt: trashedAt && trashedAt <= Date.now() ? trashedAt : 0
+  };
+}
+
+function sanitizeBackupDeleted(rawDeleted) {
+  const deleted = {};
+  if (rawDeleted && typeof rawDeleted === 'object' && !Array.isArray(rawDeleted)) {
+    Object.keys(rawDeleted).slice(0, 10000).forEach(id => {
+      const cleanId = sanitizeString(id, 100).trim();
+      const ts = sanitizeTimestamp(rawDeleted[id]);
+      if (cleanId && ts) deleted[cleanId] = ts;
+    });
+  }
+  return deleted;
+}
+
 function sanitizeBackupSnapshot(raw) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     throw new Error('备份中没有有效的数据快照');
@@ -2720,6 +3692,7 @@ function sanitizeBackupSnapshot(raw) {
 
   const out = { _lastModified: 0, _tagsUpdatedAt: {}, _deleted: {} };
   let total = 0;
+  let noteCount = 0;
 
   SECTIONS.forEach(s => {
     const rawItems = Array.isArray(raw[`collect_${s}`]) ? raw[`collect_${s}`] : [];
@@ -2736,21 +3709,26 @@ function sanitizeBackupSnapshot(raw) {
 
     out[`tags_${s}`] = sanitizeTagList(raw[`tags_${s}`], 40, 500);
     out._tagsUpdatedAt[s] = sanitizeTimestamp(raw?._tagsUpdatedAt?.[s]);
-
-    const rawDeleted = raw?._deleted?.[s];
-    const deleted = {};
-    if (rawDeleted && typeof rawDeleted === 'object' && !Array.isArray(rawDeleted)) {
-      Object.keys(rawDeleted).slice(0, 10000).forEach(id => {
-        const cleanId = sanitizeString(id, 100).trim();
-        const ts = sanitizeTimestamp(rawDeleted[id]);
-        if (cleanId && ts) deleted[cleanId] = ts;
-      });
-    }
-    out._deleted[s] = deleted;
+    out._deleted[s] = sanitizeBackupDeleted(raw?._deleted?.[s]);
   });
 
+  const rawNotes = Array.isArray(raw[`collect_${NOTEBOOK_SECTION}`])
+    ? raw[`collect_${NOTEBOOK_SECTION}`]
+    : [];
+  const noteItems = [];
+  const seenNoteIds = new Set();
+  for (const rawNote of rawNotes.slice(0, 2000)) {
+    const note = sanitizeBackupNote(rawNote);
+    if (!note || seenNoteIds.has(note.id)) continue;
+    seenNoteIds.add(note.id);
+    noteItems.push(note);
+  }
+  out[`collect_${NOTEBOOK_SECTION}`] = sortItemsForSync(noteItems);
+  noteCount = noteItems.length;
+  out._deleted[NOTEBOOK_SECTION] = sanitizeBackupDeleted(raw?._deleted?.[NOTEBOOK_SECTION]);
+
   out._lastModified = computeLastModified(out);
-  return { snapshot: out, total };
+  return { snapshot: out, total, noteCount };
 }
 
 function parseBackupPayload(payload) {
@@ -2768,10 +3746,11 @@ function parseBackupPayload(payload) {
     throw new Error('备份内容为空');
   }
 
-  const { snapshot, total } = sanitizeBackupSnapshot(payload.snapshot);
+  const hasNotes = Object.prototype.hasOwnProperty.call(payload.snapshot, `collect_${NOTEBOOK_SECTION}`);
+  const { snapshot, total, noteCount } = sanitizeBackupSnapshot(payload.snapshot);
   const hasTags = SECTIONS.some(s => snapshot[`tags_${s}`].length > 0);
-  if (total === 0 && !hasTags) {
-    throw new Error('备份中没有可导入的作品或标签');
+  if (total === 0 && noteCount === 0 && !hasTags) {
+    throw new Error('备份中没有可导入的作品、草稿或标签');
   }
 
   const authorHistory = {};
@@ -2784,7 +3763,10 @@ function parseBackupPayload(payload) {
     authorHistory,
     theme: payload.theme === 'dark' ? 'dark' : payload.theme === 'light' ? 'light' : '',
     exportedAt: sanitizeTimestamp(Date.parse(payload.exportedAt)),
-    total
+    total,
+    noteCount,
+    hasNotes,
+    version
   };
 }
 
@@ -2794,8 +3776,8 @@ function collectAuthorHistory() {
   return out;
 }
 
-function downloadText(filename, text) {
-  const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+function downloadText(filename, text, mime = 'application/json;charset=utf-8') {
+  const blob = new Blob([text], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -2816,6 +3798,7 @@ function backupFilename(suffix = '') {
 
 function exportBackup(silent = false, suffix = '') {
   try {
+    flushNoteEditor();
     const payload = {
       format: BACKUP_FORMAT,
       version: BACKUP_VERSION,
@@ -2877,13 +3860,17 @@ function renderImportSummary(parsed) {
   const exportedAt = parsed.exportedAt
     ? new Date(parsed.exportedAt).toLocaleString()
     : '未知';
+  const noteRow = parsed.hasNotes
+    ? `<div class="row"><span>📝 笔记本</span><span>${parsed.snapshot[`collect_${NOTEBOOK_SECTION}`].length} 篇草稿</span></div>`
+    : `<div class="row"><span>📝 笔记本</span><span>旧版备份不含草稿，覆盖导入时保留本机草稿</span></div>`;
   summary.innerHTML = `
     <div class="privacy-box">
       <p>备份导出时间：${escapeHtml(exportedAt)}</p>
-      <p>共 ${Number(parsed.total) || 0} 条作品记录。导入前请确认来源可信。</p>
+      <p>共 ${Number(parsed.total) || 0} 条作品、${Number(parsed.noteCount) || 0} 篇草稿。导入前请确认来源可信。</p>
     </div>
     <div class="import-summary-list">
       ${SECTIONS.map(s => `<div class="row"><span>${SECTION_ICONS[s]} ${SECTION_LABELS[s]}</span><span>${parsed.snapshot[`collect_${s}`].length} 条 · ${parsed.snapshot[`tags_${s}`].length} 个标签</span></div>`).join('')}
+      ${noteRow}
     </div>
   `;
 }
@@ -2905,6 +3892,7 @@ function updateImportState() {
 
 function confirmImport() {
   if (!pendingImport) return;
+  flushNoteEditor();
   const overwrite = !!document.getElementById('import-overwrite-check')?.checked;
 
   if (overwrite && !exportBackup(true, '-导入前')) {
@@ -2921,7 +3909,7 @@ function confirmImport() {
       _lastModified: 0,
       _deleted: {}
     };
-    SECTIONS.forEach(s => {
+    SYNC_SECTIONS.forEach(s => {
       const deleted = { ...(current._deleted?.[s] || {}) };
       const incoming = pendingImport.snapshot._deleted?.[s] || {};
       Object.keys(incoming).forEach(id => {
@@ -2932,6 +3920,11 @@ function confirmImport() {
         (item.updatedAt || 0) > (deleted[item.id] || 0)
       );
     });
+    // 旧版备份没有笔记本：覆盖导入不能顺手清空本机草稿
+    if (!pendingImport.hasNotes) {
+      next[`collect_${NOTEBOOK_SECTION}`] = current[`collect_${NOTEBOOK_SECTION}`] || [];
+      next._deleted[NOTEBOOK_SECTION] = current._deleted?.[NOTEBOOK_SECTION] || {};
+    }
     next._lastModified = computeLastModified(next);
   } else {
     next = mergeSnapshots(current, pendingImport.snapshot);
@@ -2953,6 +3946,7 @@ function confirmImport() {
   const writeFailed = storageWriteFailed;
   storageWriteFailed = false;
   const importedCount = pendingImport.total;
+  const importedNotes = pendingImport.noteCount;
   activeTagFilter = {};
   renderAllSections();
   closeImportModal();
@@ -2961,7 +3955,9 @@ function confirmImport() {
   if (writeFailed) {
     showToast('本机存储空间不足，导入可能不完整；导入前的备份已下载');
   } else {
-    showToast(`导入完成 ✓ 备份中含 ${importedCount} 条作品`);
+    const parts = [`${importedCount} 条作品`];
+    if (importedNotes) parts.push(`${importedNotes} 篇草稿`);
+    showToast(`导入完成 ✓ 备份中含 ${parts.join('、')}`);
     if (canUseCloudSync()) scheduleCloudSync(1200);
   }
 }
@@ -3229,6 +4225,7 @@ async function syncToCloud() {
 
   isSyncing = true;
   try {
+    flushNoteEditor();
     const local = buildLocalSnapshot();
     const { data, error } = await supabaseClient
       .from('user_data')
@@ -3264,6 +4261,7 @@ async function pullFromCloud() {
       .maybeSingle();
     if (error) throw error;
 
+    flushNoteEditor();
     const local = buildLocalSnapshot();
 
     if (!data || !data.data) {
@@ -3467,10 +4465,18 @@ function initTabs() {
 }
 
 function switchSection(section) {
+  if (currentSection === NOTEBOOK_SECTION && section !== NOTEBOOK_SECTION) {
+    flushNoteEditor();
+  }
   currentSection = section;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.section === section));
   document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.dataset.section === section));
-  renderSection(section);
+  if (section === NOTEBOOK_SECTION) {
+    if (notesInitialized) purgeExpiredNotes(true);
+    renderNotesPanel();
+  } else {
+    renderSection(section);
+  }
 }
 
 // ========== Toast ==========
@@ -3536,6 +4542,10 @@ function updateRatingDisplay() {
 
 // ========== Render Section ==========
 function renderSection(section) {
+  if (section === NOTEBOOK_SECTION) {
+    renderNotesPanel();
+    return;
+  }
   renderTags(section);
   renderCards(section);
   updateCounts();
@@ -3544,8 +4554,13 @@ function renderSection(section) {
 function updateCounts() {
   SECTIONS.forEach(s => {
     const data = getData(s);
-    document.getElementById(`count-${s}`).textContent = data.length;
+    const el = document.getElementById(`count-${s}`);
+    if (el) el.textContent = data.length;
   });
+  const noteCountEl = document.getElementById('count-notes');
+  if (noteCountEl) {
+    noteCountEl.textContent = getNotes().filter(n => !n.trashedAt).length;
+  }
 }
 
 // ========== Tags ==========
@@ -3991,6 +5006,7 @@ function init() {
   initTheme();
   initTabs();
   SECTIONS.forEach(s => renderSection(s));
+  initNotes();
   updateCounts();
   initSupabase();
   updateSyncStatus();
@@ -4011,7 +5027,11 @@ Object.assign(window, {
   handleCoverFile, removeCoverPreview, updateRatingDisplay,
   openDetail, closeDetailModal, deleteItem,
   openDetailFromSearch, searchByTag,
-  debounceAuthorSearch, saveTmdbApiKey
+  debounceAuthorSearch, saveTmdbApiKey,
+  startNewNote, openNote, closeNoteEditorMobile, onNoteTitleInput, onNoteContentInput,
+  noteCompositionStart, noteCompositionEnd, onNotesSearchInput,
+  toggleNotesTrash, restoreNote, permanentlyDeleteNote, emptyNotesTrash,
+  toggleCurrentNotePin, copyCurrentNote, exportCurrentNote, trashCurrentNote
 });
 
 init();
