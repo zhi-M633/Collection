@@ -1,0 +1,4020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.themoviedb.org https://openlibrary.org; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="作品收藏录">
+<meta name="theme-color" content="#0071e3">
+<meta name="mobile-web-app-capable" content="yes">
+<title>个人作品收藏录</title>
+<style>
+/* ========== CSS Variables & Themes ========== */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f0f2;
+  --bg-modal: #ffffff;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-muted: #aeaeb2;
+  --border: #d2d2d7;
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-light: rgba(0,113,227,0.1);
+  --danger: #ff3b30;
+  --danger-hover: #ff453a;
+  --success: #34c759;
+  --star: #ff9500;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.25s ease;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1c1c1e;
+  --bg-secondary: #2c2c2e;
+  --bg-card: #2c2c2e;
+  --bg-hover: #3a3a3c;
+  --bg-modal: #2c2c2e;
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-muted: #636366;
+  --border: #48484a;
+  --accent: #0a84ff;
+  --accent-hover: #409cff;
+  --accent-light: rgba(10,132,255,0.15);
+  --danger: #ff453a;
+  --danger-hover: #ff6961;
+  --success: #30d158;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+/* ========== Reset & Base ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background var(--transition), color var(--transition);
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  transition: all var(--transition);
+}
+
+input, textarea {
+  font-family: inherit;
+  font-size: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+textarea { resize: vertical; min-height: 80px; }
+
+/* ========== Header ========== */
+.header {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+}
+
+.theme-toggle:hover { background: var(--bg-hover); }
+
+.sync-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sync-btn:hover { background: var(--bg-hover); }
+.sync-btn.synced { background: rgba(52,199,89,0.1); border-color: var(--success); color: var(--success); }
+.sync-btn.sync-warn { background: rgba(255,149,0,0.12); border-color: var(--star); color: #b26a00; }
+[data-theme="dark"] .sync-btn.sync-warn { color: var(--star); }
+.sync-btn.sync-error { background: rgba(255,59,48,0.1); border-color: var(--danger); color: var(--danger); }
+
+/* ========== Tab Navigation ========== */
+.tab-nav {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-list {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 4px;
+}
+
+.tab-btn {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border-bottom: 2.5px solid transparent;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+.tab-btn .tab-count {
+  display: inline-block;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 10px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 6px;
+  padding: 0 6px;
+}
+
+/* ========== Main Content ========== */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* ========== Search & Add Bar ========== */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-bar input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-bar .btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,113,227,0.3);
+}
+.btn-primary:hover { background: linear-gradient(135deg, var(--accent-hover), var(--accent)); box-shadow: 0 4px 12px rgba(0,113,227,0.4); transform: translateY(-1px); }
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover { background: var(--danger-hover); }
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+/* ========== Search Results Dropdown ========== */
+.search-wrapper { position: relative; flex: 1; min-width: 200px; }
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+}
+
+.search-results.show { display: block; }
+
+.search-result-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--bg-hover); }
+
+.search-result-item img {
+  width: 40px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.search-result-info { flex: 1; min-width: 0; }
+.search-result-info .title { font-weight: 600; font-size: 14px; }
+.search-result-info .meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.search-loading {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ========== Content Layout ========== */
+.content-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.sidebar-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+  position: sticky;
+  top: 80px;
+}
+
+.sidebar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tag-add-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.tag-add-row input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.tag-add-row button {
+  padding: 6px 10px;
+  font-size: 13px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.tag-list { display: flex; flex-direction: column; gap: 4px; }
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background var(--transition);
+}
+
+.tag-item:hover { background: var(--bg-hover); }
+.tag-item.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+
+.tag-item .tag-delete {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.tag-item:hover .tag-delete { opacity: 1; }
+.tag-item .tag-delete:hover { background: var(--danger); color: #fff; }
+
+.content-area { flex: 1; min-width: 0; }
+
+/* ========== Cards Grid ========== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-rank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.card-rank.top3 {
+  background: linear-gradient(135deg, #ff9500, #ff6b00);
+}
+
+.card-cover {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-secondary);
+}
+
+.card-cover-placeholder {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, var(--accent-light), var(--bg-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: var(--text-muted);
+}
+
+.card-body { padding: 14px; }
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.card-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.card-rating .stars {
+  color: var(--star);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.card-rating .score {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--star);
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.card-tag {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ========== Modal ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--bg-modal);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.modal-body { padding: 20px 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border);
+}
+
+.modal-btn {
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+/* ========== Form Fields ========== */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+/* ========== Rating Input ========== */
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  outline: none;
+  border: none;
+}
+
+.rating-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.rating-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--star);
+  min-width: 36px;
+  text-align: center;
+}
+
+/* ========== Tag Selector in Modal ========== */
+.tag-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.tag-chip:hover { border-color: var(--accent); color: var(--accent); }
+.tag-chip.selected {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ========== Detail Modal ========== */
+.detail-cover {
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.detail-cover-placeholder {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(135deg, var(--accent-light), var(--bg-secondary));
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  margin-bottom: 16px;
+}
+
+.detail-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.detail-intro {
+  font-size: 14px;
+  color: var(--accent);
+  font-style: italic;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: var(--accent-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+  line-height: 1.5;
+}
+
+.detail-meta {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  display: flex;
+  gap: 16px;
+}
+
+.detail-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.detail-rating .stars { color: var(--star); font-size: 18px; letter-spacing: 2px; }
+.detail-rating .score { font-size: 24px; font-weight: 700; color: var(--star); }
+
+.detail-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-review {
+  padding: 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ========== Empty State ========== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state .text { font-size: 15px; }
+
+/* ========== API Key Settings ========== */
+.settings-bar {
+  background: var(--accent-light);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.settings-bar input {
+  flex: 1;
+  max-width: 300px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.settings-bar button {
+  padding: 6px 14px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.settings-bar.saved {
+  background: rgba(52,199,89,0.1);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ========== Data & Privacy Modal ========== */
+.settings-section {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.settings-section:first-child { padding-top: 0; }
+.settings-section:last-child { border-bottom: none; padding-bottom: 0; }
+
+.settings-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.settings-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 6px 0;
+}
+
+.settings-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.settings-actions .modal-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 9px 14px;
+  font-size: 13px;
+}
+
+.settings-actions .btn-small {
+  flex: none;
+}
+
+.privacy-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin: 10px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.privacy-box ul {
+  margin: 6px 0 0 18px;
+}
+
+.privacy-box li { margin: 3px 0; }
+
+.consent-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.consent-check input {
+  width: auto;
+  flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+
+.toggle-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.toggle-row input {
+  width: auto;
+  flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 12px;
+  padding: 6px 0;
+  cursor: pointer;
+  text-align: left;
+}
+.link-btn:hover { text-decoration: underline; }
+
+.settings-section summary {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.settings-section details[open] summary { margin-bottom: 12px; }
+
+.auth-alt {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+.status-dot.ok { background: var(--success); }
+.status-dot.warn { background: var(--star); }
+.status-dot.error { background: var(--danger); }
+
+.import-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin: 10px 0;
+}
+.import-summary-list .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.import-summary-list .row span:last-child { color: var(--text-secondary); }
+
+.danger-text { color: var(--danger); }
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 300;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ========== Cover Image Input ========== */
+.cover-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cover-input-group input[type="text"] {
+  flex: 1;
+}
+
+.cover-file-btn {
+  white-space: nowrap;
+  padding: 10px 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cover-preview {
+  margin-top: 8px;
+  display: none;
+}
+
+.cover-preview.show {
+  display: block;
+}
+
+.cover-preview img {
+  max-width: 100%;
+  max-height: 160px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.cover-preview .cover-preview-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+}
+
+.cover-preview .cover-remove {
+  font-size: 12px;
+  color: var(--danger);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 2px 0;
+}
+
+/* ========== Keyword Tags ========== */
+.keyword-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.keyword-tag {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  background: rgba(52,199,89,0.1);
+  color: var(--success);
+  font-weight: 500;
+}
+
+/* ========== Search Tag Hint ========== */
+.search-tag-hint {
+  padding: 8px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--accent);
+  transition: background var(--transition);
+}
+
+.search-tag-hint:last-child { border-bottom: none; }
+.search-tag-hint:hover { background: var(--accent-light); }
+.search-tag-hint .tag-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ========== Touch Device Optimizations ========== */
+@media (hover: none) {
+  .card:hover { transform: none; box-shadow: var(--shadow); }
+  .card:active { transform: scale(0.98); }
+  .btn:hover { transform: none; }
+  .btn:active { transform: scale(0.97); }
+  .tag-item:hover { background: transparent; }
+  .tag-item .tag-delete { opacity: 1; }
+  .search-result-item:hover { background: transparent; }
+  .search-tag-hint:hover { background: transparent; }
+  .tag-chip:hover { border-color: var(--border); color: var(--text-secondary); }
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .content-layout { flex-direction: column; }
+  .sidebar { width: 100%; }
+  .sidebar-card {
+    position: static;
+    display: none;
+  }
+  .sidebar-card.mobile-show { display: block; }
+  .sidebar-toggle {
+    display: flex;
+  }
+  .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .search-bar { flex-direction: column; }
+  .search-wrapper { min-width: 100%; }
+  .modal {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+    height: 100vh;
+  }
+  .modal-overlay { padding: 0; }
+  .modal-header { padding: 16px 16px 0; }
+  .modal-body { padding: 16px; }
+  .modal-footer { padding: 12px 16px; }
+  .modal-btn { flex: 1; text-align: center; }
+  .header { padding: 0 12px; }
+  .header-inner { height: 48px; }
+  .logo { font-size: 16px; }
+  .sync-btn { font-size: 11px; padding: 4px 8px; max-width: 100px; }
+  .tab-nav { padding: 0 12px; }
+  .tab-btn { padding: 10px 12px; font-size: 13px; }
+  .tab-btn .tab-count { display: none; }
+  .main { padding: 12px; }
+  .card-body { padding: 10px; }
+  .card-title { font-size: 13px; }
+  .card-meta { font-size: 11px; }
+  .card-rating .stars { font-size: 11px; }
+  .card-rating .score { font-size: 12px; }
+  .card-tag { font-size: 10px; padding: 1px 6px; }
+  .keyword-tag { font-size: 10px; padding: 1px 6px; }
+  .card-cover, .card-cover-placeholder { height: 120px; }
+  .card-rank { width: 24px; height: 24px; font-size: 11px; }
+  .detail-title { font-size: 18px; }
+  .detail-meta { font-size: 13px; gap: 10px; flex-wrap: wrap; }
+  .detail-review { font-size: 13px; padding: 10px; }
+  .detail-intro { font-size: 13px; padding: 8px 10px; }
+  .detail-actions { flex-direction: column; }
+  .detail-actions .btn { width: 100%; text-align: center; }
+  .search-result-item { padding: 8px 12px; }
+  .search-result-info .title { font-size: 13px; }
+  .search-result-info .meta { font-size: 11px; }
+  .search-results { max-height: 50vh; }
+  .tag-add-row { flex-wrap: wrap; }
+  .tag-add-row input { min-width: 0; }
+  .detail-cover { max-height: 180px; }
+  .detail-cover-placeholder { height: 100px; font-size: 36px; }
+  .rating-slider { height: 8px; }
+  .rating-slider::-webkit-slider-thumb { width: 24px; height: 24px; }
+  .form-group { margin-bottom: 14px; }
+  .cover-input-group { flex-wrap: wrap; }
+  .cover-input-group input[type="text"] { min-width: 0; }
+  .cover-file-btn { width: 100%; text-align: center; justify-content: center; }
+}
+
+/* Sidebar toggle button - desktop hidden */
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 100%;
+}
+.sidebar-toggle:hover { background: var(--bg-hover); }
+</style>
+</head>
+<body>
+
+<!-- ========== Header ========== -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">📖 作品收藏录</div>
+    <div class="header-actions">
+      <button class="sync-btn" id="sync-status" onclick="openSyncModal()" title="同步设置">☁️ 未配置同步</button>
+      <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ========== Tab Navigation ========== -->
+<nav class="tab-nav">
+  <div class="tab-list" id="tabList">
+    <button class="tab-btn active" data-section="movies">🎬 电影 <span class="tab-count" id="count-movies">0</span></button>
+    <button class="tab-btn" data-section="books">📚 书本 <span class="tab-count" id="count-books">0</span></button>
+    <button class="tab-btn" data-section="musicals">🎭 音乐剧 <span class="tab-count" id="count-musicals">0</span></button>
+    <button class="tab-btn" data-section="fanfiction">💕 同人文 <span class="tab-count" id="count-fanfiction">0</span></button>
+    <button class="tab-btn" data-section="webnovels">📖 网文漫画 <span class="tab-count" id="count-webnovels">0</span></button>
+  </div>
+</nav>
+
+<!-- ========== Main Content ========== -->
+<main class="main">
+  <!-- Movie Section -->
+  <div class="section active" id="section-movies" data-section="movies">
+    <div class="search-bar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="搜索已收藏的电影..." id="search-movies" oninput="debounceSearch('movies')" onfocus="showSearchResults('movies')">
+        <div class="search-results" id="results-movies"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="openAddModal('movies')">+ 添加电影</button>
+    </div>
+    <div class="content-layout">
+      <button class="sidebar-toggle" onclick="toggleSidebar('movies')">🏷️ 标签分类 ▾</button>
+      <aside class="sidebar" id="sidebar-movies">
+        <div class="sidebar-card">
+          <div class="sidebar-title">标签分类 <button class="btn btn-small btn-secondary" onclick="openTagModal('movies')">+</button></div>
+          <div class="tag-list" id="tags-movies"></div>
+        </div>
+      </aside>
+      <div class="content-area">
+        <div class="cards-grid" id="grid-movies"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book Section -->
+  <div class="section" id="section-books" data-section="books">
+    <div class="search-bar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="搜索已收藏的书本..." id="search-books" oninput="debounceSearch('books')" onfocus="showSearchResults('books')">
+        <div class="search-results" id="results-books"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="openAddModal('books')">+ 添加书本</button>
+    </div>
+    <div class="content-layout">
+      <button class="sidebar-toggle" onclick="toggleSidebar('books')">🏷️ 标签分类 ▾</button>
+      <aside class="sidebar" id="sidebar-books">
+        <div class="sidebar-card">
+          <div class="sidebar-title">标签分类 <button class="btn btn-small btn-secondary" onclick="openTagModal('books')">+</button></div>
+          <div class="tag-list" id="tags-books"></div>
+        </div>
+      </aside>
+      <div class="content-area">
+        <div class="cards-grid" id="grid-books"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Musical Section -->
+  <div class="section" id="section-musicals" data-section="musicals">
+    <div class="search-bar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="搜索已收藏的音乐剧..." id="search-musicals" oninput="debounceSearch('musicals')" onfocus="showSearchResults('musicals')">
+        <div class="search-results" id="results-musicals"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="openAddModal('musicals')">+ 添加音乐剧</button>
+    </div>
+    <div class="content-layout">
+      <button class="sidebar-toggle" onclick="toggleSidebar('musicals')">🏷️ 标签分类 ▾</button>
+      <aside class="sidebar" id="sidebar-musicals">
+        <div class="sidebar-card">
+          <div class="sidebar-title">标签分类 <button class="btn btn-small btn-secondary" onclick="openTagModal('musicals')">+</button></div>
+          <div class="tag-list" id="tags-musicals"></div>
+        </div>
+      </aside>
+      <div class="content-area">
+        <div class="cards-grid" id="grid-musicals"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fanfiction Section -->
+  <div class="section" id="section-fanfiction" data-section="fanfiction">
+    <div class="search-bar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="搜索已收藏的同人文..." id="search-fanfiction" oninput="debounceSearch('fanfiction')" onfocus="showSearchResults('fanfiction')">
+        <div class="search-results" id="results-fanfiction"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="openAddModal('fanfiction')">+ 添加同人文</button>
+    </div>
+    <div class="content-layout">
+      <button class="sidebar-toggle" onclick="toggleSidebar('fanfiction')">🏷️ 标签分类 ▾</button>
+      <aside class="sidebar" id="sidebar-fanfiction">
+        <div class="sidebar-card">
+          <div class="sidebar-title">标签分类 <button class="btn btn-small btn-secondary" onclick="openTagModal('fanfiction')">+</button></div>
+          <div class="tag-list" id="tags-fanfiction"></div>
+        </div>
+      </aside>
+      <div class="content-area">
+        <div class="cards-grid" id="grid-fanfiction"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Web Novel / Comic Section -->
+  <div class="section" id="section-webnovels" data-section="webnovels">
+    <div class="search-bar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="搜索已收藏的网文/漫画..." id="search-webnovels" oninput="debounceSearch('webnovels')" onfocus="showSearchResults('webnovels')">
+        <div class="search-results" id="results-webnovels"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="openAddModal('webnovels')">+ 添加网文/漫画</button>
+    </div>
+    <div class="content-layout">
+      <button class="sidebar-toggle" onclick="toggleSidebar('webnovels')">🏷️ 标签分类 ▾</button>
+      <aside class="sidebar" id="sidebar-webnovels">
+        <div class="sidebar-card">
+          <div class="sidebar-title">标签分类 <button class="btn btn-small btn-secondary" onclick="openTagModal('webnovels')">+</button></div>
+          <div class="tag-list" id="tags-webnovels"></div>
+        </div>
+      </aside>
+      <div class="content-area">
+        <div class="cards-grid" id="grid-webnovels"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ========== Add/Edit Modal ========== -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="addModalTitle">添加作品</h2>
+      <button class="modal-close" onclick="closeAddModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>作品名称 *</label>
+        <input type="text" id="form-title" placeholder="输入作品名称" maxlength="200">
+      </div>
+      <div class="form-group">
+        <label id="form-author-label">作者/导演</label>
+        <input type="text" id="form-author" list="author-datalist"
+               placeholder="输入作者/导演（支持自动推荐）" maxlength="100"
+               oninput="debounceAuthorSearch()">
+      </div>
+      <div class="form-group">
+        <label>国家/地区</label>
+        <input type="text" id="form-country" list="country-datalist"
+               placeholder="点击展开常见国家列表，也可自由输入" maxlength="60">
+      </div>
+      <div class="form-group">
+        <label>封面图片（可选）</label>
+        <div class="cover-input-group">
+          <input type="text" id="form-cover" placeholder="输入图片链接" maxlength="1500000">
+          <label class="btn btn-secondary cover-file-btn" for="form-cover-file">📁 本地导入</label>
+          <input type="file" id="form-cover-file" accept="image/*" onchange="handleCoverFile(this)" style="display:none;">
+        </div>
+        <div id="cover-preview" class="cover-preview"></div>
+      </div>
+      <div class="form-group">
+        <label>评分</label>
+        <div class="rating-input">
+          <input type="range" class="rating-slider" id="form-rating" min="0" max="10" step="0.5" value="0" oninput="updateRatingDisplay()">
+          <span class="rating-value" id="form-rating-display">0.0</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>我的评价</label>
+        <textarea id="form-review" placeholder="写下你的感受..." maxlength="5000"></textarea>
+      </div>
+      <div class="form-group">
+        <label>关键词标签</label>
+        <input type="text" id="form-keywords" placeholder="用逗号分隔，如：科幻, 烧脑, 诺兰" maxlength="600">
+      </div>
+      <div class="form-group">
+        <label>介绍词（可选）</label>
+        <textarea id="form-intro" placeholder="一句话介绍这部作品..." style="min-height:60px;" maxlength="1000"></textarea>
+      </div>
+      <div class="form-group">
+        <label>分类标签</label>
+        <div class="tag-selector" id="form-tags"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary modal-btn" onclick="closeAddModal()">✕ 取消</button>
+      <button class="btn btn-primary modal-btn" id="form-submit-btn" onclick="submitForm()">✓ 添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Data & Privacy Modal ========== -->
+<div class="modal-overlay" id="syncModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>数据与隐私</h2>
+      <button class="modal-close" onclick="closeSyncModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="status-line">
+        <span class="status-dot" id="data-status-dot"></span>
+        <span id="data-status-text">数据仅保存在本机</span>
+      </div>
+
+      <section class="settings-section">
+        <h3 class="settings-section-title">本机备份</h3>
+        <p class="settings-hint">数据默认只保存在当前浏览器。换手机、清缓存、换浏览器或换域名前，请先导出备份。</p>
+        <div class="settings-actions">
+          <button class="btn btn-primary modal-btn" onclick="exportBackup()">导出备份</button>
+          <button class="btn btn-secondary modal-btn" onclick="openImportPicker()">导入恢复</button>
+        </div>
+        <input type="file" id="backup-file-input" accept=".json,application/json" onchange="handleBackupFile(this)" style="display:none;">
+        <p class="settings-meta" id="backup-last-time"></p>
+        <p class="settings-meta" id="local-storage-usage"></p>
+      </section>
+
+      <section class="settings-section" id="sync-unconfigured" style="display:none;">
+        <h3 class="settings-section-title">云端账号</h3>
+        <div class="privacy-box">
+          <p id="sync-unconfigured-text">云同步尚未配置。你仍然可以正常在本机使用，并通过“导出备份”迁移数据。</p>
+          <p>如需跨设备同步，请按 README 创建你自己的 Supabase 项目，然后把 Project URL 和 anon public key 填入 <code>index.html</code>，并确保 <code>supabase.min.js</code> 与页面放在同一目录。</p>
+        </div>
+      </section>
+
+      <section class="settings-section" id="sync-auth-area" style="display:none;">
+        <h3 class="settings-section-title">云端账号</h3>
+        <div id="sync-login-area">
+          <p class="settings-hint">首次登录不会上传数据；上传需要你在下方单独授权。若本机保留过该账号的授权，登录后会沿用。</p>
+          <div id="auth-login-panel">
+            <div class="form-group">
+              <label>邮箱</label>
+              <input type="email" id="sync-email" placeholder="you@example.com" autocomplete="email" maxlength="254" oninput="updateLoginState()">
+            </div>
+            <div class="form-group">
+              <label>密码</label>
+              <input type="password" id="sync-password" placeholder="输入登录密码" autocomplete="current-password" maxlength="200"
+                     oninput="updateLoginState()"
+                     onkeydown="if(event.key==='Enter')loginSupabase(document.getElementById('sync-email').value, document.getElementById('sync-password').value)">
+            </div>
+            <button class="btn btn-primary modal-btn" id="login-btn" style="width:100%;" onclick="loginSupabase(document.getElementById('sync-email').value, document.getElementById('sync-password').value)">登录</button>
+            <div class="auth-alt">
+              <span>还没有账号？</span>
+              <button class="link-btn" type="button" onclick="showRegisterPanel()">注册新账号</button>
+            </div>
+            <p class="settings-meta">忘记密码可在 Supabase 控制台 → Authentication → Users 中重置。</p>
+          </div>
+
+          <div id="auth-register-panel" style="display:none;">
+            <div class="privacy-box">
+              <p>注册会创建你自己的云端账号。你的邮箱将发送到你的 Supabase 项目用于登录；作品数据不会自动上传，稍后仍需单独授权。</p>
+            </div>
+            <div class="form-group">
+              <label>邮箱</label>
+              <input type="email" id="register-email" placeholder="you@example.com" autocomplete="email" maxlength="254" oninput="updateRegisterState()">
+            </div>
+            <div class="form-group">
+              <label>密码（至少 10 位）</label>
+              <input type="password" id="register-password" placeholder="建议使用密码管理器生成" autocomplete="new-password" maxlength="200" oninput="updateRegisterState()">
+            </div>
+            <div class="form-group">
+              <label>再次输入密码</label>
+              <input type="password" id="register-password-confirm" placeholder="再次输入" autocomplete="new-password" maxlength="200" oninput="updateRegisterState()"
+                     onkeydown="if(event.key==='Enter')registerSupabase()">
+            </div>
+            <label class="consent-check">
+              <input type="checkbox" id="register-consent" onchange="updateRegisterState()">
+              <span>我确认这是我本人的邮箱，并同意使用该邮箱在 Supabase 创建账号。</span>
+            </label>
+            <div class="settings-actions">
+              <button class="btn btn-primary modal-btn" id="register-btn" onclick="registerSupabase()" disabled>确认注册</button>
+              <button class="btn btn-secondary modal-btn" type="button" onclick="showLoginPanel()">返回登录</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="sync-logged-in" style="display:none;">
+          <p style="font-size:14px;color:var(--accent);margin-bottom:6px;" id="sync-user-email"></p>
+          <p class="settings-meta" id="sync-last-time"></p>
+          <div class="settings-actions">
+            <button class="btn btn-primary modal-btn" onclick="syncNow()">立即同步</button>
+            <button class="btn btn-secondary modal-btn" onclick="logoutSupabase()">退出登录</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section" id="cloud-consent-area" style="display:none;">
+        <h3 class="settings-section-title">云端同步授权</h3>
+        <div class="privacy-box">
+          <p><strong>授权后会发生：</strong></p>
+          <ul>
+            <li>从你的 Supabase 云端账号读取作品数据，并按更新时间合并到本机。</li>
+            <li>将本机的作品名称、作者/导演、国家/地区、评分、评价、介绍、两套标签、封面图片和删除记录上传。</li>
+            <li>作品数据中不包含：本机作者输入历史、TMDB Key、主题偏好。同步请求本身仍会向你的 Supabase 项目暴露 IP 和常规请求信息。</li>
+          </ul>
+          <p>云端由你自己的 Supabase 项目托管，行级权限（RLS）确保只有你的账号能读写；传输使用 HTTPS。当前未启用端到端加密，Supabase 作为服务方技术上可访问存储内容。</p>
+        </div>
+        <label class="consent-check">
+          <input type="checkbox" id="cloud-consent-check" onchange="updateCloudConsentState()">
+          <span>我已阅读并授权上述数据的读取与上传。</span>
+        </label>
+        <div class="settings-actions">
+          <button class="btn btn-primary modal-btn" id="enable-sync-btn" onclick="enableCloudSync()" disabled>启用云同步</button>
+          <button class="btn btn-secondary modal-btn" type="button" onclick="closeSyncModal()">暂不启用</button>
+        </div>
+      </section>
+
+      <section class="settings-section" id="sync-controls-area" style="display:none;">
+        <h3 class="settings-section-title">同步控制</h3>
+        <p class="settings-hint" id="sync-controls-hint">云同步已启用。</p>
+        <div class="settings-actions">
+          <button class="btn btn-secondary modal-btn" id="pause-sync-btn" onclick="pauseCloudSync()">暂停云同步</button>
+          <button class="btn btn-primary modal-btn" id="resume-sync-btn" onclick="resumeCloudSync()" style="display:none;">恢复云同步</button>
+        </div>
+        <details style="margin-top:14px;">
+          <summary>撤回授权与云端数据</summary>
+          <p class="settings-hint">撤回授权后，本机数据保留，但不再读取或上传云端。删除云端数据前，请先在其他设备上暂停同步，否则它们可能重新上传。</p>
+          <div class="settings-actions">
+            <button class="btn btn-secondary modal-btn" onclick="revokeCloudConsent()">撤回云同步授权</button>
+            <button class="btn btn-secondary modal-btn danger-text" onclick="deleteCloudData()">删除云端数据</button>
+          </div>
+        </details>
+      </section>
+
+      <section class="settings-section">
+        <h3 class="settings-section-title">隐私设置</h3>
+        <label class="toggle-row">
+          <input type="checkbox" id="external-lookup-toggle" onchange="saveExternalLookupSetting(this.checked)">
+          <span>启用外部作者推荐（TMDB / Open Library）</span>
+        </label>
+        <p class="settings-hint">默认关闭。关闭时只使用本机作者历史，不会向第三方发送任何搜索词。开启后，输入作者名会发送给对应服务。</p>
+        <div id="tmdb-settings" style="display:none;">
+          <div class="form-group" style="margin-top:12px;">
+            <label>TMDB API Key（电影板块）</label>
+            <input type="text" id="tmdb-api-key-input" placeholder="从 TMDB 设置页面获取（免费）" maxlength="100">
+          </div>
+          <button class="btn btn-secondary modal-btn" style="width:100%;" onclick="saveTmdbApiKey()">保存 Key</button>
+        </div>
+      </section>
+
+      <details class="settings-section">
+        <summary>更多安全与隐私说明</summary>
+        <div class="privacy-box">
+          <ul>
+            <li>本机数据保存在浏览器 LocalStorage，默认不上传；只有你授权并启用云同步后，修改才会自动上传。建议为手机和电脑设置锁屏密码，不要在公共设备上登录。</li>
+            <li>云端同步需要你在这里勾选授权；可随时暂停或撤回。退出登录不会删除本机数据。</li>
+            <li>创建账号后，建议在 Supabase 后台关闭新用户注册，只保留你自己的账号；并妥善保管账号密码。</li>
+            <li>本应用没有统计、广告或第三方追踪脚本。Supabase SDK 已放在本目录，避免从第三方 CDN 加载。</li>
+            <li>外部封面图片会由对应图片服务器加载；应用已设置不发送来源页面信息，但图片服务器仍能看到你的 IP。</li>
+            <li>免费 Supabase 项目连续 7 天不活跃会被暂停，控制台点一次恢复即可。</li>
+          </ul>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== Account Switch Confirmation ========== -->
+<div class="modal-overlay" id="accountSwitchModal" data-static="true">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h2>切换账号确认</h2>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;line-height:1.7;margin-bottom:10px;">你正在登录另一个账号。本机现有 <strong id="switch-local-count">0</strong> 条作品记录。</p>
+      <div class="privacy-box">
+        <p>继续切换会清空本机数据；旧账号的云端数据不会被删除。为了不丢失尚未同步的内容，建议先导出备份。</p>
+      </div>
+      <div class="settings-actions">
+        <button class="btn btn-primary modal-btn" onclick="switchAccountWithBackup()">导出备份并继续</button>
+        <button class="btn btn-secondary modal-btn" onclick="cancelAccountSwitch()">取消并退出新账号</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Import Backup Modal ========== -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h2>导入备份</h2>
+      <button class="modal-close" onclick="closeImportModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="import-summary"></div>
+      <label class="consent-check">
+        <input type="checkbox" id="import-overwrite-check" onchange="updateImportState()">
+        <span>覆盖本机数据（会先自动导出当前数据作为备份）</span>
+      </label>
+      <p class="settings-hint" id="import-mode-hint"></p>
+      <div class="settings-actions">
+        <button class="btn btn-primary modal-btn" id="import-confirm-btn" onclick="confirmImport()">合并导入</button>
+        <button class="btn btn-secondary modal-btn" onclick="closeImportModal()">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========== Hidden Datalists (Country & Author Autocomplete) ========== -->
+<datalist id="country-datalist">
+  <option value="中国">
+  <option value="日本">
+  <option value="美国">
+  <option value="英国">
+  <option value="法国">
+  <option value="德国">
+  <option value="韩国">
+  <option value="意大利">
+  <option value="俄罗斯">
+  <option value="西班牙">
+  <option value="加拿大">
+  <option value="澳大利亚">
+  <option value="印度">
+  <option value="泰国">
+  <option value="越南">
+  <option value="菲律宾">
+  <option value="印度尼西亚">
+  <option value="马来西亚">
+  <option value="新加坡">
+  <option value="台湾">
+  <option value="香港">
+  <option value="巴西">
+  <option value="墨西哥">
+  <option value="阿根廷">
+  <option value="南非">
+  <option value="埃及">
+  <option value="土耳其">
+  <option value="伊朗">
+  <option value="以色列">
+  <option value="瑞典">
+  <option value="挪威">
+  <option value="丹麦">
+  <option value="芬兰">
+  <option value="荷兰">
+  <option value="比利时">
+  <option value="瑞士">
+  <option value="奥地利">
+  <option value="波兰">
+  <option value="捷克">
+  <option value="希腊">
+</datalist>
+<datalist id="author-datalist"></datalist>
+
+<!-- ========== Tag Management Modal ========== -->
+<div class="modal-overlay" id="tagModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <h2>管理标签</h2>
+      <button class="modal-close" onclick="closeTagModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="tag-add-row">
+        <input type="text" id="new-tag-input" placeholder="新标签名称" onkeydown="if(event.key==='Enter')addTag()">
+        <button onclick="addTag()">添加</button>
+      </div>
+      <div class="tag-list" id="tag-modal-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Detail Modal ========== -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>作品详情</h2>
+      <button class="modal-close" onclick="closeDetailModal()">×</button>
+    </div>
+    <div class="modal-body" id="detail-content"></div>
+  </div>
+</div>
+
+<!-- ========== Toast ========== -->
+<div class="toast" id="toast"></div>
+
+<!-- Supabase SDK v2.118.0，本地托管，避免第三方 CDN 脚本风险 -->
+<script src="./supabase.min.js"></script>
+<script type="module">
+
+// ========== Constants ==========
+const SECTIONS = ['movies', 'books', 'musicals', 'fanfiction', 'webnovels'];
+const SECTION_LABELS = { movies: '电影', books: '书本', musicals: '音乐剧', fanfiction: '同人文', webnovels: '网文漫画' };
+const SECTION_ICONS = { movies: '🎬', books: '📚', musicals: '🎭', fanfiction: '💕', webnovels: '📖' };
+const SECTION_AUTHOR_LABELS = { movies: '导演', books: '作者', musicals: '', fanfiction: '大大', webnovels: '作者' };
+
+// ========== 国家地区列表（静态，~40 个常见国家） ==========
+const COMMON_COUNTRIES = [
+  '中国','日本','美国','英国','法国','德国','韩国','意大利','俄罗斯','西班牙',
+  '加拿大','澳大利亚','印度','泰国','越南','菲律宾','印度尼西亚','马来西亚','新加坡',
+  '台湾','香港','巴西','墨西哥','阿根廷','南非','埃及','土耳其','伊朗','以色列',
+  '瑞典','挪威','丹麦','芬兰','荷兰','比利时','瑞士','奥地利','波兰','捷克','希腊'
+];
+
+// ========== State ==========
+let currentSection = 'movies';
+let currentEditId = null;
+let currentTagSection = null;
+let activeTagFilter = {}; // { section: tagName or null }
+let searchDebounceTimer = null;
+let authBusy = false;
+let storageWriteFailed = false;
+let storageErrorUntil = 0;
+
+// ========== 作者自动推荐状态 ==========
+let authorSearchDebounceTimer = null;
+let authorSuggestionCache = new Map(); // {section: Set of known authors}
+let pendingAuthorSearches = new Map(); // {section: AbortController for in-flight requests}
+
+// ========== Supabase Config ==========
+// 1. 在 https://supabase.com 创建项目（Region 建议选 Singapore）
+// 2. 进入 Project Settings → API，复制 Project URL 和 anon public key
+// 3. 填入下面两行后保存（anon key 可以公开，数据由 RLS 保护）
+const SUPABASE_URL = 'https://ymdqmhugoigmcgdyfysv.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_9ndaGkAy0W99wNuN49kUqA_JqszxI5t';
+const SUPABASE_CONFIGURED =
+  !SUPABASE_URL.includes('YOUR-PROJECT') && !SUPABASE_ANON_KEY.includes('YOUR-ANON');
+
+// ========== 隐私 / 备份常量 ==========
+const CLOUD_CONSENT_VERSION = 1;
+const EXTERNAL_LOOKUP_KEY = 'external_author_lookup_v1';
+const LAST_BACKUP_KEY = 'last_backup_time';
+const BACKUP_FORMAT = 'works-collection-backup';
+const BACKUP_VERSION = 1;
+const MAX_BACKUP_FILE_BYTES = 10 * 1024 * 1024;
+const TOMBSTONE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+
+// ========== Sync State ==========
+let supabaseClient = null;
+let currentUser = null;
+let supabaseReady = false;
+let syncChannel = null;
+let syncTimer = null;
+let pullTimer = null;
+let pollTimer = null;
+let isSyncing = false;
+let lastCloudUpdatedAt = 0;
+let lastSyncError = null;
+let authHandledUid = null;
+let pendingAccountSwitch = null;
+let pendingImport = null;
+
+// ========== LocalStorage Helpers ==========
+// 所有写入都经过这里，统一处理配额不足，避免静默丢数据
+function safeSetItem(key, value, silent = false) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    storageWriteFailed = true;
+    console.error('LocalStorage write failed:', key, e);
+    const now = Date.now();
+    if (!silent && now >= storageErrorUntil) {
+      storageErrorUntil = now + 5000;
+      showToast('本机存储空间不足，数据未保存。请先导出备份，再删除部分封面图片。');
+    }
+    return false;
+  }
+}
+
+function getData(section) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(`collect_${section}`));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+
+function setData(section, data) {
+  const ok = safeSetItem(`collect_${section}`, JSON.stringify(data));
+  if (ok) scheduleCloudSync();
+  return ok;
+}
+
+function getTags(section) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(`tags_${section}`));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+
+function setTags(section, tags) {
+  if (!safeSetItem(`tags_${section}`, JSON.stringify(tags))) return false;
+  if (!safeSetItem(`tags_updated_${section}`, String(Date.now()))) return false;
+  scheduleCloudSync();
+  return true;
+}
+
+function getTagsUpdatedAt(section) {
+  return parseInt(localStorage.getItem(`tags_updated_${section}`) || '0', 10) || 0;
+}
+
+// 删除墓碑：记录被删除条目的 id 和时间，防止另一台设备把旧数据合并回来
+function getDeletedMap() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem('collect_deleted'));
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch { return {}; }
+}
+
+function recordDeletion(section, id) {
+  const all = getDeletedMap();
+  all[section] = all[section] || {};
+  all[section][id] = Date.now();
+  return safeSetItem('collect_deleted', JSON.stringify(all));
+}
+
+function clearLocalCollections() {
+  SECTIONS.forEach(s => {
+    localStorage.removeItem(`collect_${s}`);
+    localStorage.removeItem(`tags_${s}`);
+    localStorage.removeItem(`tags_updated_${s}`);
+  });
+  localStorage.removeItem('collect_deleted');
+}
+
+function totalLocalItemCount() {
+  return SECTIONS.reduce((sum, s) => sum + getData(s).length, 0);
+}
+
+function hasLocalData() {
+  return totalLocalItemCount() > 0 ||
+    SECTIONS.some(s => getTags(s).length > 0);
+}
+
+function estimateLocalStorageUsage() {
+  let bytes = 0;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key || !(key.startsWith('collect_') || key.startsWith('tags_'))) continue;
+      bytes += (key.length + (localStorage.getItem(key) || '').length) * 2;
+    }
+  } catch {}
+  return bytes;
+}
+
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 KB';
+  if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function updateStorageMeta() {
+  const lastEl = document.getElementById('backup-last-time');
+  if (lastEl) {
+    const last = Number(localStorage.getItem(LAST_BACKUP_KEY) || 0);
+    lastEl.textContent = last
+      ? '上次导出备份：' + new Date(last).toLocaleString()
+      : '还没有导出过备份';
+  }
+  const usageEl = document.getElementById('local-storage-usage');
+  if (usageEl) {
+    usageEl.textContent = '本机作品数据约 ' + formatBytes(estimateLocalStorageUsage()) +
+      '（浏览器通常上限约 5 MB）';
+  }
+}
+
+// ========== 云端授权状态 ==========
+function cloudConsentKey(uid) {
+  return `cloud_consent_v${CLOUD_CONSENT_VERSION}_${uid}`;
+}
+
+function cloudSyncEnabledKey(uid) {
+  return `cloud_sync_enabled_${uid}`;
+}
+
+function hasCloudConsent(uid) {
+  if (!uid) return false;
+  try { return !!localStorage.getItem(cloudConsentKey(uid)); } catch { return false; }
+}
+
+function isCloudSyncEnabled(uid) {
+  if (!uid) return false;
+  try { return localStorage.getItem(cloudSyncEnabledKey(uid)) === '1'; } catch { return false; }
+}
+
+function canUseCloudSync() {
+  return !!(supabaseClient && currentUser && !pendingAccountSwitch &&
+    hasCloudConsent(currentUser.id) && isCloudSyncEnabled(currentUser.id));
+}
+
+// ========== Supabase Setup ==========
+function initSupabase() {
+  if (!SUPABASE_CONFIGURED) return false;
+  if (supabaseClient) return true;
+  if (!window.supabase || !window.supabase.createClient) {
+    console.error('Supabase SDK 加载失败，请确认 supabase.min.js 与页面在同一目录');
+    return false;
+  }
+  try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+    supabaseReady = true;
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      const user = session?.user || null;
+      // Supabase 官方建议不要在回调里直接 await，改为异步派发
+      setTimeout(() => handleAuthUser(user), 0);
+    });
+
+    // 恢复上次登录状态；即使恢复会话，也必须已有本机授权才会同步（见 canUseCloudSync）
+    supabaseClient.auth.getSession().then(({ data }) => {
+      handleAuthUser(data?.session?.user || null);
+    }).catch(() => {
+      updateSyncStatus();
+      updateSyncModalUI();
+    });
+
+    return true;
+  } catch (e) {
+    console.error('Supabase init failed:', e);
+    supabaseReady = false;
+    return false;
+  }
+}
+
+function handleAuthUser(user) {
+  if (!user && pendingAccountSwitch) {
+    pendingAccountSwitch = null;
+    document.getElementById('accountSwitchModal')?.classList.remove('show');
+  }
+
+  const previousUid = currentUser?.id || null;
+  currentUser = user;
+
+  if (!user) {
+    authHandledUid = null;
+    stopSyncListeners();
+    updateSyncStatus();
+    updateSyncModalUI();
+    return;
+  }
+
+  if (authHandledUid === user.id) {
+    updateSyncStatus();
+    updateSyncModalUI();
+    return;
+  }
+
+  if (pendingAccountSwitch && pendingAccountSwitch.id === user.id) {
+    updateSyncStatus();
+    updateSyncModalUI();
+    return;
+  }
+
+  const lastUid = localStorage.getItem('last_sync_uid');
+  if (lastUid && lastUid !== user.id && hasLocalData()) {
+    // 本机还有上一个账号的数据：先让用户选择，绝不静默清空
+    pendingAccountSwitch = user;
+    // 在用户确认前停止旧账号的所有轮询/实时监听，避免两个账号的数据混在一起
+    clearTimeout(syncTimer);
+    clearTimeout(pullTimer);
+    stopSyncListeners();
+    const modal = document.getElementById('accountSwitchModal');
+    const countEl = document.getElementById('switch-local-count');
+    if (countEl) countEl.textContent = String(totalLocalItemCount());
+    if (modal) modal.classList.add('show');
+    updateSyncStatus();
+    updateSyncModalUI();
+    return;
+  }
+
+  finishSignIn(user, !!(previousUid && previousUid !== user.id));
+}
+
+function finishSignIn(user, switchedAccount) {
+  const previousLastUid = localStorage.getItem('last_sync_uid');
+  pendingAccountSwitch = null;
+  authHandledUid = user.id;
+  currentUser = user;
+  safeSetItem('last_sync_uid', user.id, true);
+  document.getElementById('accountSwitchModal')?.classList.remove('show');
+
+  if (switchedAccount || previousLastUid !== user.id) {
+    lastCloudUpdatedAt = 0;
+    lastSyncError = null;
+    localStorage.removeItem('last_sync_time');
+  }
+
+  updateSyncStatus();
+  updateSyncModalUI();
+
+  if (canUseCloudSync()) {
+    startSyncListeners();
+    pullFromCloud();
+  } else {
+    stopSyncListeners();
+  }
+
+  if (switchedAccount) showToast('已切换账号');
+}
+
+function switchAccountWithBackup() {
+  const user = pendingAccountSwitch;
+  if (!user) return;
+
+  if (!exportBackup(true, '-切换账号前')) {
+    showToast('备份导出失败，已取消切换，请重试');
+    return;
+  }
+
+  stopSyncListeners();
+  clearTimeout(syncTimer);
+  clearTimeout(pullTimer);
+  clearLocalCollections();
+  activeTagFilter = {};
+  currentTagSection = null;
+  currentEditId = null;
+  lastCloudUpdatedAt = 0;
+  lastSyncError = null;
+  localStorage.removeItem('last_sync_time');
+
+  document.querySelectorAll('.modal-overlay.show').forEach(m => {
+    if (m.id !== 'accountSwitchModal') m.classList.remove('show');
+  });
+  renderAllSections();
+  finishSignIn(user, true);
+}
+
+async function cancelAccountSwitch() {
+  pendingAccountSwitch = null;
+  document.getElementById('accountSwitchModal')?.classList.remove('show');
+  stopSyncListeners();
+  authHandledUid = null;
+  currentUser = null;
+  await signOutCurrentSession();
+  lastSyncError = null;
+  updateSyncStatus();
+  updateSyncModalUI();
+  showToast('已退出新账号，本机数据未受影响');
+}
+
+async function signOutCurrentSession() {
+  if (!supabaseClient) return;
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) await supabaseClient.auth.signOut({ scope: 'local' });
+  } catch {
+    try { await supabaseClient.auth.signOut({ scope: 'local' }); } catch {}
+  }
+}
+
+// ========== Sync UI ==========
+function syncUiState() {
+  if (!SUPABASE_CONFIGURED) {
+    return { text: '本机模式', cls: '', title: '云同步未配置，数据仅保存在本机', dot: 'ok', detail: '本机模式 · 云同步未配置' };
+  }
+  if (!supabaseReady) {
+    return { text: '⚠️ 同步不可用', cls: 'sync-error', title: '云同步组件未能加载', dot: 'error', detail: '云同步组件未能加载，本机数据不受影响' };
+  }
+  if (!currentUser) {
+    return { text: '🔒 未登录', cls: '', title: '点击查看数据与隐私设置', dot: 'ok', detail: '本机模式 · 未登录云端账号' };
+  }
+  if (pendingAccountSwitch) {
+    return { text: '⚠️ 待确认', cls: 'sync-warn', title: '检测到另一个账号，等待你确认是否切换', dot: 'warn', detail: '检测到另一个账号，等待确认切换' };
+  }
+  if (!hasCloudConsent(currentUser.id)) {
+    return { text: '☁️ 待授权', cls: 'sync-warn', title: '已登录，但尚未授权上传数据', dot: 'warn', detail: '已登录 · 尚未授权云同步' };
+  }
+  if (!isCloudSyncEnabled(currentUser.id)) {
+    return { text: '⏸️ 已暂停', cls: 'sync-warn', title: '云同步已暂停', dot: 'warn', detail: '已登录 · 云同步已暂停' };
+  }
+  if (lastSyncError) {
+    return { text: '⚠️ 同步异常', cls: 'sync-error', title: lastSyncError, dot: 'error', detail: lastSyncError };
+  }
+  return { text: '☁️ 已开启', cls: 'synced', title: '云同步已开启', dot: 'ok', detail: '云同步已开启' };
+}
+
+function updateSyncStatus() {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const state = syncUiState();
+  el.textContent = state.text;
+  el.className = 'sync-btn' + (state.cls ? ' ' + state.cls : '');
+  el.title = state.title;
+}
+
+function updateSyncModalUI() {
+  const state = syncUiState();
+  const dot = document.getElementById('data-status-dot');
+  const statusText = document.getElementById('data-status-text');
+  if (dot) dot.className = 'status-dot ' + state.dot;
+  if (statusText) {
+    const email = currentUser?.email ? ' · ' + currentUser.email : '';
+    statusText.textContent = state.detail + email;
+  }
+
+  const ready = SUPABASE_CONFIGURED && supabaseReady;
+  const unconfigured = document.getElementById('sync-unconfigured');
+  const authArea = document.getElementById('sync-auth-area');
+  const loginArea = document.getElementById('sync-login-area');
+  const loggedIn = document.getElementById('sync-logged-in');
+  const consentArea = document.getElementById('cloud-consent-area');
+  const controlsArea = document.getElementById('sync-controls-area');
+
+  if (unconfigured) unconfigured.style.display = ready ? 'none' : 'block';
+  if (!ready) {
+    if (authArea) authArea.style.display = 'none';
+    if (consentArea) consentArea.style.display = 'none';
+    if (controlsArea) controlsArea.style.display = 'none';
+    const text = document.getElementById('sync-unconfigured-text');
+    if (text) {
+      text.textContent = SUPABASE_CONFIGURED
+        ? '云同步组件 supabase.min.js 未能加载。请确认该文件与 index.html 放在同一目录，然后刷新页面。'
+        : '云同步尚未配置。你仍然可以正常在本机使用，并通过“导出备份”迁移数据。';
+    }
+    updateStorageMeta();
+    return;
+  }
+
+  if (authArea) authArea.style.display = 'block';
+
+  if (!currentUser) {
+    if (loginArea) loginArea.style.display = 'block';
+    if (loggedIn) loggedIn.style.display = 'none';
+    if (consentArea) consentArea.style.display = 'none';
+    if (controlsArea) controlsArea.style.display = 'none';
+    updateLoginState();
+  } else {
+    if (loginArea) loginArea.style.display = 'none';
+    if (loggedIn) loggedIn.style.display = 'block';
+
+    const emailEl = document.getElementById('sync-user-email');
+    if (emailEl) emailEl.textContent = '✅ 已登录：' + (currentUser.email || currentUser.id);
+    const last = localStorage.getItem('last_sync_time');
+    const lastEl = document.getElementById('sync-last-time');
+    if (lastEl) {
+      lastEl.textContent = last
+        ? '上次成功同步：' + new Date(Number(last)).toLocaleString()
+        : '尚未完成过同步';
+    }
+
+    const consent = hasCloudConsent(currentUser.id);
+    if (consentArea) consentArea.style.display = consent ? 'none' : 'block';
+    if (controlsArea) controlsArea.style.display = consent ? 'block' : 'none';
+
+    if (consent) {
+      const enabled = isCloudSyncEnabled(currentUser.id);
+      const pauseBtn = document.getElementById('pause-sync-btn');
+      const resumeBtn = document.getElementById('resume-sync-btn');
+      const hint = document.getElementById('sync-controls-hint');
+      if (pauseBtn) pauseBtn.style.display = enabled ? '' : 'none';
+      if (resumeBtn) resumeBtn.style.display = enabled ? 'none' : '';
+      if (hint) {
+        hint.textContent = enabled
+          ? '云同步已启用：本机修改会在约 1 秒后上传，并接收其他设备的更新。'
+          : '云同步已暂停：本机数据仍会保存，但不会读取或上传云端。';
+      }
+    } else {
+      const check = document.getElementById('cloud-consent-check');
+      if (check) check.checked = false;
+      updateCloudConsentState();
+    }
+  }
+
+  updateExternalLookupUI();
+  updateStorageMeta();
+}
+
+function openSyncModal() {
+  const modal = document.getElementById('syncModal');
+  if (!modal) return;
+  modal.classList.add('show');
+  if (!currentUser) showLoginPanel();
+  const tmdbInput = document.getElementById('tmdb-api-key-input');
+  if (tmdbInput) tmdbInput.value = getTmdbApiKey();
+  updateSyncModalUI();
+  updateExternalLookupUI();
+  updateStorageMeta();
+}
+
+function closeSyncModal() {
+  document.getElementById('syncModal')?.classList.remove('show');
+  ['sync-password', 'register-password', 'register-password-confirm'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const registerConsent = document.getElementById('register-consent');
+  if (registerConsent) registerConsent.checked = false;
+  const cloudConsent = document.getElementById('cloud-consent-check');
+  if (cloudConsent) cloudConsent.checked = false;
+  authBusy = false;
+  updateLoginState();
+  updateRegisterState();
+}
+
+function showLoginPanel() {
+  const login = document.getElementById('auth-login-panel');
+  const register = document.getElementById('auth-register-panel');
+  if (login) login.style.display = 'block';
+  if (register) register.style.display = 'none';
+  const registerConsent = document.getElementById('register-consent');
+  if (registerConsent) registerConsent.checked = false;
+  const loginEmail = document.getElementById('sync-email');
+  const registerEmail = document.getElementById('register-email');
+  if (loginEmail && registerEmail && !loginEmail.value) loginEmail.value = registerEmail.value.trim();
+  updateRegisterState();
+  updateLoginState();
+}
+
+function showRegisterPanel() {
+  const login = document.getElementById('auth-login-panel');
+  const register = document.getElementById('auth-register-panel');
+  if (login) login.style.display = 'none';
+  if (register) register.style.display = 'block';
+  const loginEmail = document.getElementById('sync-email');
+  const registerEmail = document.getElementById('register-email');
+  if (registerEmail && loginEmail && !registerEmail.value) registerEmail.value = loginEmail.value.trim();
+  const registerConsent = document.getElementById('register-consent');
+  if (registerConsent) registerConsent.checked = false;
+  updateRegisterState();
+  setTimeout(() => registerEmail?.focus(), 100);
+}
+
+function updateLoginState() {
+  const email = document.getElementById('sync-email')?.value.trim() || '';
+  const password = document.getElementById('sync-password')?.value || '';
+  const btn = document.getElementById('login-btn');
+  if (!btn) return;
+  const ok = !authBusy && !!supabaseClient && email.includes('@') && password.length > 0;
+  btn.disabled = !ok;
+  btn.textContent = authBusy ? '登录中…' : '登录';
+}
+
+function updateRegisterState() {
+  const email = document.getElementById('register-email')?.value.trim() || '';
+  const password = document.getElementById('register-password')?.value || '';
+  const confirm = document.getElementById('register-password-confirm')?.value || '';
+  const consent = !!document.getElementById('register-consent')?.checked;
+  const btn = document.getElementById('register-btn');
+  if (!btn) return;
+  const ok = !authBusy && !!supabaseClient &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
+    password.length >= 10 &&
+    password === confirm &&
+    consent;
+  btn.disabled = !ok;
+  btn.textContent = authBusy ? '注册中…' : '确认注册';
+  btn.title = ok
+    ? ''
+    : '需要有效邮箱、至少 10 位且两次一致的密码，并勾选同意';
+}
+
+function updateCloudConsentState() {
+  const checked = !!document.getElementById('cloud-consent-check')?.checked;
+  const btn = document.getElementById('enable-sync-btn');
+  if (btn) btn.disabled = !checked;
+}
+
+// ========== Auth ==========
+function translateAuthError(msg) {
+  if (/Invalid login credentials/i.test(msg)) return '邮箱或密码错误';
+  if (/User already registered/i.test(msg)) return '该邮箱已注册，请直接登录';
+  if (/Email not confirmed/i.test(msg)) return '邮箱尚未验证，请先点击邮件里的验证链接（或在 Supabase 后台关闭邮箱验证）';
+  if (/Password should be at least/i.test(msg)) return '密码长度不符合项目要求';
+  if (/Unable to validate email address|email_address_invalid/i.test(msg)) return '邮箱格式不正确';
+  if (/For security purposes|rate limit|too many/i.test(msg)) return '操作太频繁，请稍后再试';
+  if (/Signups not allowed|signup_disabled/i.test(msg)) return '该项目已关闭新用户注册';
+  if (/fetch|network|Failed to fetch/i.test(msg)) return '网络连接失败，请确认当前网络能访问 Supabase';
+  return msg;
+}
+
+async function loginSupabase(email, password) {
+  if (!supabaseClient) { showToast('云同步尚未配置'); return; }
+
+  email = String(email || '').trim();
+  password = String(password || '');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('邮箱格式不正确'); return; }
+  if (!password) { showToast('请输入密码'); return; }
+
+  authBusy = true;
+  updateLoginState();
+  try {
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      showToast('登录失败：' + translateAuthError(error.message || ''));
+      return;
+    }
+    const pwdEl = document.getElementById('sync-password');
+    if (pwdEl) pwdEl.value = '';
+    showToast('登录成功 ✓');
+  } catch (e) {
+    showToast('登录失败：' + (e.message || e));
+  } finally {
+    authBusy = false;
+    updateLoginState();
+    updateRegisterState();
+  }
+}
+
+async function registerSupabase() {
+  if (!supabaseClient) { showToast('云同步尚未配置'); return; }
+
+  const email = document.getElementById('register-email')?.value.trim() || '';
+  const password = document.getElementById('register-password')?.value || '';
+  const confirm = document.getElementById('register-password-confirm')?.value || '';
+  const consent = !!document.getElementById('register-consent')?.checked;
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('邮箱格式不正确'); return; }
+  if (password.length < 10) { showToast('密码至少 10 位'); return; }
+  if (password !== confirm) { showToast('两次输入的密码不一致'); return; }
+  if (!consent) { showToast('请先勾选同意使用该邮箱创建账号'); return; }
+
+  authBusy = true;
+  updateRegisterState();
+  try {
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    if (error) {
+      showToast('注册失败：' + translateAuthError(error.message || ''));
+      return;
+    }
+    ['register-password', 'register-password-confirm'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const consentEl = document.getElementById('register-consent');
+    if (consentEl) consentEl.checked = false;
+
+    if (data.session) {
+      showToast('账号已创建并登录 ✓');
+    } else {
+      showToast('注册成功，请先到邮箱完成验证，再回来登录');
+      showLoginPanel();
+    }
+  } catch (e) {
+    showToast('注册失败：' + (e.message || e));
+  } finally {
+    authBusy = false;
+    updateLoginState();
+    updateRegisterState();
+  }
+}
+
+async function logoutSupabase() {
+  if (!supabaseClient) return;
+  stopSyncListeners();
+  clearTimeout(syncTimer);
+  clearTimeout(pullTimer);
+  authHandledUid = null;
+  pendingAccountSwitch = null;
+  currentUser = null;
+  lastSyncError = null;
+  lastCloudUpdatedAt = 0;
+  await signOutCurrentSession();
+  updateSyncStatus();
+  updateSyncModalUI();
+  showToast('已退出登录（本机数据仍保留）');
+}
+
+async function syncNow() {
+  if (!currentUser) { showToast('请先登录'); return; }
+  if (!hasCloudConsent(currentUser.id)) { showToast('请先授权云同步'); return; }
+  if (!isCloudSyncEnabled(currentUser.id)) { showToast('云同步已暂停，请先恢复'); return; }
+  showToast('正在同步…');
+  await syncToCloud();
+}
+
+// ========== 云同步授权控制 ==========
+function enableCloudSync() {
+  if (!supabaseClient || !currentUser) { showToast('请先登录'); return; }
+  const check = document.getElementById('cloud-consent-check');
+  if (!check || !check.checked) { showToast('请先勾选授权'); return; }
+
+  if (!safeSetItem(cloudConsentKey(currentUser.id), String(Date.now())) ||
+      !safeSetItem(cloudSyncEnabledKey(currentUser.id), '1')) {
+    return;
+  }
+  check.checked = false;
+  lastSyncError = null;
+  updateSyncStatus();
+  updateSyncModalUI();
+  startSyncListeners();
+  pullFromCloud();
+  showToast('云同步已启用，正在同步…');
+}
+
+function pauseCloudSync() {
+  if (!currentUser) return;
+  safeSetItem(cloudSyncEnabledKey(currentUser.id), '0');
+  clearTimeout(syncTimer);
+  clearTimeout(pullTimer);
+  stopSyncListeners();
+  lastSyncError = null;
+  updateSyncStatus();
+  updateSyncModalUI();
+  showToast('云同步已暂停，本机数据不变');
+}
+
+function resumeCloudSync() {
+  if (!currentUser) return;
+  if (!hasCloudConsent(currentUser.id)) {
+    showToast('请先重新授权云同步');
+    updateSyncModalUI();
+    return;
+  }
+  safeSetItem(cloudSyncEnabledKey(currentUser.id), '1');
+  lastSyncError = null;
+  updateSyncStatus();
+  updateSyncModalUI();
+  startSyncListeners();
+  pullFromCloud();
+  showToast('云同步已恢复');
+}
+
+function revokeCloudConsent() {
+  if (!currentUser) return;
+  if (!confirm('撤回授权后，本机将停止读取和上传云端数据。本机已有数据不会删除。确定撤回吗？')) return;
+
+  const uid = currentUser.id;
+  try {
+    localStorage.removeItem(cloudConsentKey(uid));
+    localStorage.removeItem(cloudSyncEnabledKey(uid));
+  } catch {}
+  clearTimeout(syncTimer);
+  clearTimeout(pullTimer);
+  stopSyncListeners();
+  lastSyncError = null;
+  updateSyncStatus();
+  updateSyncModalUI();
+  showToast('已撤回云同步授权');
+}
+
+async function deleteCloudData() {
+  if (!supabaseClient || !currentUser) { showToast('请先登录'); return; }
+  if (!confirm('这会永久删除云端账号里的全部作品数据（本机数据保留）。如果其他设备仍在同步，它们可能重新上传。确定删除吗？')) return;
+
+  const uid = currentUser.id;
+  clearTimeout(syncTimer);
+  clearTimeout(pullTimer);
+  stopSyncListeners();
+
+  try {
+    const { error } = await supabaseClient.from('user_data').delete().eq('user_id', uid);
+    if (error) throw error;
+    try {
+      localStorage.removeItem(cloudConsentKey(uid));
+      localStorage.removeItem(cloudSyncEnabledKey(uid));
+      localStorage.removeItem('last_sync_time');
+    } catch {}
+    lastCloudUpdatedAt = 0;
+    lastSyncError = null;
+    updateSyncStatus();
+    updateSyncModalUI();
+    showToast('云端数据已删除，本机数据保留');
+  } catch (e) {
+    reportSyncError(e, 'Delete cloud data failed:');
+  }
+}
+
+// ========== Snapshot & Merge ==========
+// 递归排序 key 后再序列化，避免 Postgres jsonb 的 key 顺序变化造成误判
+function stableStringify(value) {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return '[' + value.map(stableStringify).join(',') + ']';
+  return '{' + Object.keys(value).sort()
+    .map(k => JSON.stringify(k) + ':' + stableStringify(value[k])).join(',') + '}';
+}
+
+// _lastModified 由内容推导而非 Date.now()，这样同一份数据在任何设备上算出的值都一致，
+// 合并结果才能做到幂等（否则每次拉取云端都会多推一次）
+function computeLastModified(snapshot) {
+  let ts = 0;
+  SECTIONS.forEach(s => {
+    (snapshot[`collect_${s}`] || []).forEach(item => {
+      ts = Math.max(ts, item.updatedAt || 0, item.createdAt || 0);
+    });
+    ts = Math.max(ts, snapshot._tagsUpdatedAt?.[s] || 0);
+    Object.values(snapshot._deleted?.[s] || {}).forEach(t => { ts = Math.max(ts, t || 0); });
+  });
+  return ts;
+}
+
+// 合并结果必须有确定性的顺序：否则两台设备各自"本地优先"排序不同，
+// 每次轮询都会判定有差异并互相回推，形成无限同步乒乓
+function compareItemsForSync(a, b) {
+  const ac = Number(a?.createdAt) || 0;
+  const bc = Number(b?.createdAt) || 0;
+  if (ac !== bc) return ac - bc;
+  const aid = String(a?.id || '');
+  const bid = String(b?.id || '');
+  return aid < bid ? -1 : aid > bid ? 1 : 0;
+}
+
+function compareStringsForSync(a, b) {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+function sortItemsForSync(items) {
+  return [...items].sort(compareItemsForSync);
+}
+
+function buildLocalSnapshot() {
+  const now = Date.now();
+  const allDeleted = getDeletedMap();
+  const snapshot = { _lastModified: 0, _tagsUpdatedAt: {}, _deleted: {} };
+
+  SECTIONS.forEach(s => {
+    snapshot[`collect_${s}`] = sortItemsForSync(getData(s));
+    snapshot[`tags_${s}`] = getTags(s);
+    snapshot._tagsUpdatedAt[s] = getTagsUpdatedAt(s);
+
+    const deleted = allDeleted[s] || {};
+    const pruned = {};
+    Object.keys(deleted).forEach(id => {
+      // 墓碑保留 90 天，足够覆盖长期不用的设备
+      if (now - deleted[id] < TOMBSTONE_TTL_MS) pruned[id] = deleted[id];
+    });
+    snapshot._deleted[s] = pruned;
+  });
+
+  snapshot._lastModified = computeLastModified(snapshot);
+  return snapshot;
+}
+
+function mergeSnapshots(local, cloud) {
+  const merged = { _lastModified: 0, _tagsUpdatedAt: {}, _deleted: {} };
+
+  SECTIONS.forEach(s => {
+    const localItems = Array.isArray(local?.[`collect_${s}`]) ? local[`collect_${s}`] : [];
+    const cloudItems = Array.isArray(cloud?.[`collect_${s}`]) ? cloud[`collect_${s}`] : [];
+
+    // 按 id 合并，同一作品取 updatedAt 较新的版本
+    const byId = new Map();
+    [...localItems, ...cloudItems].forEach(item => {
+      if (!item || !item.id) return;
+      const existing = byId.get(item.id);
+      if (!existing) {
+        byId.set(item.id, item);
+        return;
+      }
+      const newTs = item.updatedAt || 0;
+      const oldTs = existing.updatedAt || 0;
+      // updatedAt 完全相同时用内容做确定性裁决，保证两台设备合并出同一结果
+      if (newTs > oldTs ||
+          (newTs === oldTs && stableStringify(item) > stableStringify(existing))) {
+        byId.set(item.id, item);
+      }
+    });
+
+    // 合并删除墓碑
+    const localDeleted = local?._deleted?.[s] || {};
+    const cloudDeleted = cloud?._deleted?.[s] || {};
+    const deleted = {};
+    Object.keys({ ...localDeleted, ...cloudDeleted }).forEach(id => {
+      deleted[id] = Math.max(localDeleted[id] || 0, cloudDeleted[id] || 0);
+    });
+    merged._deleted[s] = deleted;
+
+    merged[`collect_${s}`] = sortItemsForSync(
+      [...byId.values()].filter(item =>
+        (item.updatedAt || 0) > (deleted[item.id] || 0)
+      )
+    );
+
+    // 标签列表整体按时间戳取较新的一方；时间相同则取确定性的并集
+    const localTags = Array.isArray(local?.[`tags_${s}`]) ? local[`tags_${s}`] : [];
+    const cloudTags = Array.isArray(cloud?.[`tags_${s}`]) ? cloud[`tags_${s}`] : [];
+    const localTs = local?._tagsUpdatedAt?.[s] || 0;
+    const cloudTs = cloud?._tagsUpdatedAt?.[s] || 0;
+
+    if (localTs > cloudTs) {
+      merged[`tags_${s}`] = [...localTags];
+      merged._tagsUpdatedAt[s] = localTs;
+    } else if (cloudTs > localTs) {
+      merged[`tags_${s}`] = [...cloudTags];
+      merged._tagsUpdatedAt[s] = cloudTs;
+    } else {
+      merged[`tags_${s}`] = [...new Set([...localTags, ...cloudTags])].sort(compareStringsForSync);
+      merged._tagsUpdatedAt[s] = localTs || cloudTs || 0;
+    }
+  });
+
+  merged._lastModified = computeLastModified(merged);
+  return merged;
+}
+
+function applySnapshotToLocal(snapshot) {
+  if (!snapshot) return false;
+  let changed = false;
+
+  SECTIONS.forEach(s => {
+    const items = Array.isArray(snapshot[`collect_${s}`])
+      ? sortItemsForSync(snapshot[`collect_${s}`])
+      : null;
+    if (items && JSON.stringify(items) !== JSON.stringify(getData(s))) {
+      if (safeSetItem(`collect_${s}`, JSON.stringify(items))) changed = true;
+    }
+
+    const tags = snapshot[`tags_${s}`];
+    if (Array.isArray(tags) && JSON.stringify(tags) !== JSON.stringify(getTags(s))) {
+      if (safeSetItem(`tags_${s}`, JSON.stringify(tags))) changed = true;
+    }
+
+    if (snapshot._tagsUpdatedAt?.[s] !== undefined) {
+      safeSetItem(`tags_updated_${s}`, String(snapshot._tagsUpdatedAt[s]), true);
+    }
+  });
+
+  if (snapshot._deleted) {
+    const all = getDeletedMap();
+    const cutoff = Date.now() - TOMBSTONE_TTL_MS;
+    SECTIONS.forEach(s => {
+      const incoming = snapshot._deleted[s] || {};
+      const current = { ...(all[s] || {}) };
+      Object.keys(incoming).forEach(id => {
+        current[id] = Math.max(current[id] || 0, incoming[id] || 0);
+      });
+      Object.keys(current).forEach(id => {
+        if (current[id] < cutoff) delete current[id];
+      });
+      all[s] = current;
+    });
+    safeSetItem('collect_deleted', JSON.stringify(all), true);
+  }
+
+  return changed;
+}
+
+function renderAllSections() {
+  SECTIONS.forEach(s => renderSection(s));
+  if (currentTagSection && document.getElementById('tagModal')?.classList.contains('show')) {
+    renderTagModalList();
+  }
+}
+
+// ========== 本机备份与导入 ==========
+function sanitizeString(value, maxLength) {
+  return String(value ?? '').replace(/\0/g, '').slice(0, maxLength);
+}
+
+function sanitizeTimestamp(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0 || n > 8640000000000000) return 0;
+  return Math.floor(n);
+}
+
+function sanitizeNameList(value, maxLength = 80, maxCount = 100) {
+  if (!Array.isArray(value)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const raw of value.slice(0, maxCount * 3)) {
+    const name = sanitizeString(raw, maxLength).trim();
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    out.push(name);
+    if (out.length >= maxCount) break;
+  }
+  return out;
+}
+
+function sanitizeTagList(value, maxLength = 40, maxCount = 100, stripHash = false) {
+  if (!Array.isArray(value)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const raw of value.slice(0, maxCount * 3)) {
+    let tag = sanitizeString(raw, maxLength).trim();
+    if (stripHash) tag = tag.replace(/^#/, '').trim();
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    out.push(tag);
+    if (out.length >= maxCount) break;
+  }
+  return out;
+}
+
+function sanitizeRating(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.round(Math.min(10, Math.max(0, n)) * 10) / 10;
+}
+
+function sanitizeBackupItem(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const title = sanitizeString(raw.title, 200).trim();
+  if (!title) return null;
+
+  let id = sanitizeString(raw.id, 100).trim();
+  if (!/^[A-Za-z0-9_-]{4,100}$/.test(id)) id = uuid();
+
+  const createdAt = sanitizeTimestamp(raw.createdAt) ||
+    sanitizeTimestamp(raw.updatedAt) || Date.now();
+  const updatedAt = sanitizeTimestamp(raw.updatedAt) || createdAt;
+  const coverUrl = sanitizeString(raw.coverUrl, 1500000);
+
+  return {
+    id,
+    title,
+    author: sanitizeString(raw.author, 100).trim(),
+    country: sanitizeString(raw.country, 60).trim(),
+    coverUrl: safeUrl(coverUrl),
+    rating: sanitizeRating(raw.rating),
+    review: sanitizeString(raw.review, 5000).trim(),
+    intro: sanitizeString(raw.intro, 1000).trim(),
+    keywordTags: sanitizeTagList(raw.keywordTags, 40, 30, true),
+    tags: sanitizeTagList(raw.tags, 40, 100),
+    createdAt,
+    updatedAt
+  };
+}
+
+function sanitizeBackupSnapshot(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    throw new Error('备份中没有有效的数据快照');
+  }
+
+  const out = { _lastModified: 0, _tagsUpdatedAt: {}, _deleted: {} };
+  let total = 0;
+
+  SECTIONS.forEach(s => {
+    const rawItems = Array.isArray(raw[`collect_${s}`]) ? raw[`collect_${s}`] : [];
+    const items = [];
+    const seenIds = new Set();
+    for (const rawItem of rawItems.slice(0, 10000)) {
+      const item = sanitizeBackupItem(rawItem);
+      if (!item || seenIds.has(item.id)) continue;
+      seenIds.add(item.id);
+      items.push(item);
+    }
+    out[`collect_${s}`] = sortItemsForSync(items);
+    total += items.length;
+
+    out[`tags_${s}`] = sanitizeTagList(raw[`tags_${s}`], 40, 500);
+    out._tagsUpdatedAt[s] = sanitizeTimestamp(raw?._tagsUpdatedAt?.[s]);
+
+    const rawDeleted = raw?._deleted?.[s];
+    const deleted = {};
+    if (rawDeleted && typeof rawDeleted === 'object' && !Array.isArray(rawDeleted)) {
+      Object.keys(rawDeleted).slice(0, 10000).forEach(id => {
+        const cleanId = sanitizeString(id, 100).trim();
+        const ts = sanitizeTimestamp(rawDeleted[id]);
+        if (cleanId && ts) deleted[cleanId] = ts;
+      });
+    }
+    out._deleted[s] = deleted;
+  });
+
+  out._lastModified = computeLastModified(out);
+  return { snapshot: out, total };
+}
+
+function parseBackupPayload(payload) {
+  if (!payload || payload.format !== BACKUP_FORMAT) {
+    throw new Error('这不是本应用导出的备份文件');
+  }
+  const version = Number(payload.version);
+  if (!Number.isFinite(version) || version < 1) {
+    throw new Error('无法识别备份文件的版本');
+  }
+  if (version > BACKUP_VERSION) {
+    throw new Error('备份来自更新版本的应用，请先更新页面');
+  }
+  if (!payload.snapshot || typeof payload.snapshot !== 'object') {
+    throw new Error('备份内容为空');
+  }
+
+  const { snapshot, total } = sanitizeBackupSnapshot(payload.snapshot);
+  const hasTags = SECTIONS.some(s => snapshot[`tags_${s}`].length > 0);
+  if (total === 0 && !hasTags) {
+    throw new Error('备份中没有可导入的作品或标签');
+  }
+
+  const authorHistory = {};
+  SECTIONS.forEach(s => {
+    authorHistory[s] = sanitizeNameList(payload.authorHistory?.[s], 80, 100);
+  });
+
+  return {
+    snapshot,
+    authorHistory,
+    theme: payload.theme === 'dark' ? 'dark' : payload.theme === 'light' ? 'light' : '',
+    exportedAt: sanitizeTimestamp(Date.parse(payload.exportedAt)),
+    total
+  };
+}
+
+function collectAuthorHistory() {
+  const out = {};
+  SECTIONS.forEach(s => { out[s] = getLocalAuthorHistory(s); });
+  return out;
+}
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+function backupFilename(suffix = '') {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  return `作品收藏备份-${stamp}${suffix}.json`;
+}
+
+function exportBackup(silent = false, suffix = '') {
+  try {
+    const payload = {
+      format: BACKUP_FORMAT,
+      version: BACKUP_VERSION,
+      exportedAt: new Date().toISOString(),
+      snapshot: buildLocalSnapshot(),
+      authorHistory: collectAuthorHistory(),
+      theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
+    };
+    downloadText(backupFilename(suffix), JSON.stringify(payload, null, 2));
+    safeSetItem(LAST_BACKUP_KEY, String(Date.now()), true);
+    updateStorageMeta();
+    if (!silent) showToast('备份已导出 ✓');
+    return true;
+  } catch (e) {
+    console.error('Export backup failed:', e);
+    showToast('导出失败：' + (e.message || e));
+    return false;
+  }
+}
+
+function openImportPicker() {
+  const input = document.getElementById('backup-file-input');
+  if (!input) return;
+  input.value = '';
+  input.click();
+}
+
+function handleBackupFile(input) {
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file) return;
+  if (file.size > MAX_BACKUP_FILE_BYTES) {
+    showToast('备份文件超过 10 MB，已拒绝导入');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const payload = JSON.parse(String(reader.result || ''));
+      pendingImport = parseBackupPayload(payload);
+      renderImportSummary(pendingImport);
+      const overwriteCheck = document.getElementById('import-overwrite-check');
+      if (overwriteCheck) overwriteCheck.checked = false;
+      updateImportState();
+      document.getElementById('importModal')?.classList.add('show');
+    } catch (e) {
+      pendingImport = null;
+      showToast('导入失败：' + (e.message || e));
+    }
+  };
+  reader.onerror = () => showToast('读取备份文件失败');
+  reader.readAsText(file, 'utf-8');
+}
+
+function renderImportSummary(parsed) {
+  const summary = document.getElementById('import-summary');
+  if (!summary) return;
+  const exportedAt = parsed.exportedAt
+    ? new Date(parsed.exportedAt).toLocaleString()
+    : '未知';
+  summary.innerHTML = `
+    <div class="privacy-box">
+      <p>备份导出时间：${escapeHtml(exportedAt)}</p>
+      <p>共 ${Number(parsed.total) || 0} 条作品记录。导入前请确认来源可信。</p>
+    </div>
+    <div class="import-summary-list">
+      ${SECTIONS.map(s => `<div class="row"><span>${SECTION_ICONS[s]} ${SECTION_LABELS[s]}</span><span>${parsed.snapshot[`collect_${s}`].length} 条 · ${parsed.snapshot[`tags_${s}`].length} 个标签</span></div>`).join('')}
+    </div>
+  `;
+}
+
+function updateImportState() {
+  const overwrite = !!document.getElementById('import-overwrite-check')?.checked;
+  const btn = document.getElementById('import-confirm-btn');
+  if (btn) {
+    btn.disabled = !pendingImport;
+    btn.textContent = overwrite ? '覆盖导入' : '合并导入';
+  }
+  const hint = document.getElementById('import-mode-hint');
+  if (hint) {
+    hint.textContent = overwrite
+      ? '覆盖只影响本机；会先自动导出一份当前数据。云同步开启时，云端较新的版本之后仍可能合并回来。'
+      : '合并会保留本机现有作品；同一 id 的作品以 updatedAt 较新的版本为准。';
+  }
+}
+
+function confirmImport() {
+  if (!pendingImport) return;
+  const overwrite = !!document.getElementById('import-overwrite-check')?.checked;
+
+  if (overwrite && !exportBackup(true, '-导入前')) {
+    showToast('自动备份失败，已取消导入');
+    return;
+  }
+
+  const current = buildLocalSnapshot();
+  let next;
+
+  if (overwrite) {
+    next = {
+      ...pendingImport.snapshot,
+      _lastModified: 0,
+      _deleted: {}
+    };
+    SECTIONS.forEach(s => {
+      const deleted = { ...(current._deleted?.[s] || {}) };
+      const incoming = pendingImport.snapshot._deleted?.[s] || {};
+      Object.keys(incoming).forEach(id => {
+        deleted[id] = Math.max(deleted[id] || 0, incoming[id] || 0);
+      });
+      next._deleted[s] = deleted;
+      next[`collect_${s}`] = (next[`collect_${s}`] || []).filter(item =>
+        (item.updatedAt || 0) > (deleted[item.id] || 0)
+      );
+    });
+    next._lastModified = computeLastModified(next);
+  } else {
+    next = mergeSnapshots(current, pendingImport.snapshot);
+  }
+
+  storageWriteFailed = false;
+  applySnapshotToLocal(next);
+
+  SECTIONS.forEach(s => {
+    const incoming = pendingImport.authorHistory[s] || [];
+    const names = overwrite
+      ? incoming
+      : [...new Set([...getLocalAuthorHistory(s), ...incoming])].slice(0, 100);
+    safeSetItem(`author_history_${s}`, JSON.stringify(names), true);
+  });
+
+  if (overwrite && pendingImport.theme) applyTheme(pendingImport.theme);
+
+  const writeFailed = storageWriteFailed;
+  storageWriteFailed = false;
+  const importedCount = pendingImport.total;
+  activeTagFilter = {};
+  renderAllSections();
+  closeImportModal();
+  updateStorageMeta();
+
+  if (writeFailed) {
+    showToast('本机存储空间不足，导入可能不完整；导入前的备份已下载');
+  } else {
+    showToast(`导入完成 ✓ 备份中含 ${importedCount} 条作品`);
+    if (canUseCloudSync()) scheduleCloudSync(1200);
+  }
+}
+
+function closeImportModal() {
+  document.getElementById('importModal')?.classList.remove('show');
+  pendingImport = null;
+  const check = document.getElementById('import-overwrite-check');
+  if (check) check.checked = false;
+  const summary = document.getElementById('import-summary');
+  if (summary) summary.innerHTML = '';
+  updateImportState();
+}
+
+// ========== 作者自动推荐 ==========
+// 分板块知识库：电影 → TMDB，书本 → Open Library，其他 → 本地历史
+// 本地历史在 submitForm 里自动累积，保存在 LocalStorage 中
+
+function getTmdbApiKey() {
+  try { return localStorage.getItem('tmdb_api_key') || ''; }
+  catch { return ''; }
+}
+
+function saveTmdbApiKey() {
+  const input = document.getElementById('tmdb-api-key-input');
+  const key = input ? input.value.trim() : '';
+  if (key && !/^[a-zA-Z0-9]{32,}$/.test(key)) {
+    showToast('TMDB Key 格式看起来不对，请检查后再保存');
+    return;
+  }
+  if (!safeSetItem('tmdb_api_key', key)) return;
+  showToast(key ? 'TMDB API Key 已保存' : 'TMDB API Key 已清除');
+  // 刷新电影板块的搜索缓存，下次输入立即可用
+  authorSuggestionCache.delete('movies');
+}
+
+function getExternalLookupEnabled() {
+  try { return localStorage.getItem(EXTERNAL_LOOKUP_KEY) === '1'; } catch { return false; }
+}
+
+function updateExternalLookupUI() {
+  const enabled = getExternalLookupEnabled();
+  const toggle = document.getElementById('external-lookup-toggle');
+  if (toggle) toggle.checked = enabled;
+  const tmdbSettings = document.getElementById('tmdb-settings');
+  if (tmdbSettings) tmdbSettings.style.display = enabled ? 'block' : 'none';
+}
+
+function saveExternalLookupSetting(enabled) {
+  if (enabled) {
+    const ok = confirm(
+      '开启后，输入作者名时会把搜索词发送给 TMDB（电影）或 Open Library（书本）。' +
+      '这些第三方服务会看到你的 IP 和搜索词。是否继续？'
+    );
+    if (!ok) {
+      updateExternalLookupUI();
+      return;
+    }
+  }
+
+  try {
+    localStorage.setItem(EXTERNAL_LOOKUP_KEY, enabled ? '1' : '0');
+  } catch {
+    showToast('设置保存失败');
+    updateExternalLookupUI();
+    return;
+  }
+
+  if (!enabled) {
+    pendingAuthorSearches.forEach(controller => {
+      try { controller.abort(); } catch {}
+    });
+    pendingAuthorSearches.clear();
+    updateAuthorDatalist(getLocalAuthorHistory(currentSection).slice(0, 20));
+  }
+
+  updateExternalLookupUI();
+  showToast(enabled ? '外部作者推荐已开启' : '外部作者推荐已关闭，仅使用本机历史');
+}
+
+// 本地作者历史：每板块最多存 100 条
+function getLocalAuthorHistory(section) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(`author_history_${section}`));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+
+function addAuthorToHistory(section, name) {
+  if (!name) return;
+  let history = getLocalAuthorHistory(section);
+  history = history.filter(a => a !== name);      // 去重
+  history.unshift(name);                            // 新值放最前面
+  history = history.slice(0, 100);                  // 只保留最近 100 个
+  safeSetItem(`author_history_${section}`, JSON.stringify(history), true);
+}
+
+function recordAuthorFromForm(section) {
+  const name = document.getElementById('form-author').value.trim();
+  if (name) addAuthorToHistory(section, name);
+}
+
+// 防抖搜索：输入停止 350ms 后才触发
+function debounceAuthorSearch() {
+  clearTimeout(authorSearchDebounceTimer);
+  authorSearchDebounceTimer = setTimeout(() => {
+    const query = document.getElementById('form-author').value.trim();
+    if (query.length >= 2) searchAuthors(currentSection, query);
+  }, 350);
+}
+
+async function searchAuthors(section, query) {
+  const datalist = document.getElementById('author-datalist');
+  if (!datalist) return;
+
+  // 本地历史永远是最优先的推荐，且不需要任何网络请求
+  const local = getLocalAuthorHistory(section)
+    .filter(a => a.toLowerCase().includes(query.toLowerCase()));
+
+  let suggestions = [...local];
+
+  // 外部查询必须由用户显式开启；默认只使用本机历史
+  if (getExternalLookupEnabled()) {
+    // 电影板块：TMDB（需配置 API Key）
+    if (section === 'movies' && getTmdbApiKey()) {
+      const tmdbResults = await fetchTmdbPersons(query);
+      suggestions = [...new Set([...local, ...tmdbResults])];
+    }
+    // 书本板块：Open Library（免 API Key）
+    else if (section === 'books') {
+      const olResults = await fetchOpenLibraryAuthors(query);
+      suggestions = [...new Set([...local, ...olResults])];
+    }
+  }
+
+  if (currentSection === section && document.getElementById('addModal')?.classList.contains('show')) {
+    updateAuthorDatalist(suggestions.slice(0, 20));
+  }
+}
+
+async function fetchTmdbPersons(query) {
+  const key = getTmdbApiKey();
+  if (!key || !getExternalLookupEnabled()) return [];
+  const section = 'movies';
+  let controller = null;
+  try {
+    // 用 AbortController 处理连续输入：新的搜索会取消旧的
+    if (pendingAuthorSearches.has(section)) {
+      pendingAuthorSearches.get(section).abort();
+    }
+    controller = new AbortController();
+    pendingAuthorSearches.set(section, controller);
+
+    const res = await fetch(
+      `https://api.themoviedb.org/3/search/person?api_key=${encodeURIComponent(key)}` +
+      `&language=zh-CN&query=${encodeURIComponent(query)}&include_adult=false`,
+      { signal: controller.signal }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.results || []).map(p => p.name).filter(Boolean);
+  } catch (e) {
+    if (e.name !== 'AbortError') console.warn('TMDB search failed:', e);
+    return [];
+  } finally {
+    if (controller && pendingAuthorSearches.get(section) === controller) {
+      pendingAuthorSearches.delete(section);
+    }
+  }
+}
+
+async function fetchOpenLibraryAuthors(query) {
+  const section = 'books';
+  let controller = null;
+  try {
+    if (pendingAuthorSearches.has(section)) {
+      pendingAuthorSearches.get(section).abort();
+    }
+    controller = new AbortController();
+    pendingAuthorSearches.set(section, controller);
+
+    const res = await fetch(
+      `https://openlibrary.org/search/authors.json?q=${encodeURIComponent(query)}&limit=20`,
+      { signal: controller.signal }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.docs || []).map(d => d.name).filter(Boolean);
+  } catch (e) {
+    if (e.name !== 'AbortError') console.warn('Open Library search failed:', e);
+    return [];
+  } finally {
+    if (controller && pendingAuthorSearches.get(section) === controller) {
+      pendingAuthorSearches.delete(section);
+    }
+  }
+}
+
+function updateAuthorDatalist(suggestions) {
+  const datalist = document.getElementById('author-datalist');
+  if (!datalist) return;
+  datalist.innerHTML = suggestions
+    .map(name => `<option value="${escapeHtml(name)}">`)
+    .join('');
+}
+
+// 打开表单时把本地历史填入 datalist（用户还没输入就能看到推荐）
+function preloadAuthorSuggestions() {
+  const local = getLocalAuthorHistory(currentSection);
+  updateAuthorDatalist(local.slice(0, 20));
+}
+
+// ========== Cloud Sync ==========
+function scheduleCloudSync(delay = 900) {
+  if (!canUseCloudSync()) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => syncToCloud(), delay);
+}
+
+async function pushSnapshot(snapshot) {
+  if (!canUseCloudSync()) return;
+  const { error } = await supabaseClient.from('user_data').upsert({
+    user_id: currentUser.id,
+    data: snapshot,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id' });
+  if (error) throw error;
+}
+
+function markSynced() {
+  if (!currentUser) return;
+  lastCloudUpdatedAt = Date.now();
+  lastSyncError = null;
+  localStorage.setItem('last_sync_time', String(lastCloudUpdatedAt));
+  updateSyncStatus();
+  if (document.getElementById('syncModal')?.classList.contains('show')) updateSyncModalUI();
+}
+
+// 同类错误只提示一次，避免每次改动都弹 toast
+function reportSyncError(e, context) {
+  const message = e?.message || String(e);
+  let msg;
+  if (e?.code === 'PGRST205' || /user_data|relation .* does not exist/i.test(message)) {
+    msg = '云端还没有 user_data 表，请先在 Supabase 执行 supabase.sql';
+  } else if (e?.code === '42501' || /row-level security|permission denied/i.test(message)) {
+    msg = '云端权限策略未配置，请检查 supabase.sql 是否执行完整';
+  } else if (/fetch|network|Failed to fetch/i.test(message)) {
+    msg = '无法连接 Supabase，请确认当前网络能访问 ' + SUPABASE_URL;
+  } else {
+    msg = '同步失败：' + message;
+  }
+  if (lastSyncError !== msg) {
+    lastSyncError = msg;
+    showToast(msg);
+  }
+  console.error(context, e);
+  updateSyncStatus();
+  if (document.getElementById('syncModal')?.classList.contains('show')) updateSyncModalUI();
+  else updateSyncStatus();
+}
+
+async function syncToCloud() {
+  if (!canUseCloudSync()) return;
+  if (isSyncing) { scheduleCloudSync(1500); return; }
+
+  isSyncing = true;
+  try {
+    const local = buildLocalSnapshot();
+    const { data, error } = await supabaseClient
+      .from('user_data')
+      .select('data')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+    if (error) throw error;
+
+    // 先拉取云端并合并，再上传，避免覆盖另一台设备刚做的修改
+    const merged = data?.data ? mergeSnapshots(local, data.data) : local;
+    const changedLocal = applySnapshotToLocal(merged);
+    await pushSnapshot(merged);
+    if (!canUseCloudSync()) return;
+    markSynced();
+    if (changedLocal) renderAllSections();
+  } catch (e) {
+    reportSyncError(e, 'Sync to cloud failed:');
+  } finally {
+    isSyncing = false;
+  }
+}
+
+async function pullFromCloud() {
+  if (!canUseCloudSync()) return;
+  if (isSyncing) { clearTimeout(pullTimer); pullTimer = setTimeout(pullFromCloud, 1200); return; }
+
+  isSyncing = true;
+  try {
+    const { data, error } = await supabaseClient
+      .from('user_data')
+      .select('data, updated_at')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+    if (error) throw error;
+
+    const local = buildLocalSnapshot();
+
+    if (!data || !data.data) {
+      // 云端还没有记录：把本机数据作为初始数据上传
+      await pushSnapshot(local);
+      if (!canUseCloudSync()) return;
+      markSynced();
+      return;
+    }
+
+    const cloud = data.data;
+    const merged = mergeSnapshots(local, cloud);
+    const changedLocal = applySnapshotToLocal(merged);
+
+    if (stableStringify(merged) !== stableStringify(cloud)) {
+      await pushSnapshot(merged);
+    }
+
+    if (!canUseCloudSync()) return;
+    markSynced();
+    if (changedLocal) {
+      renderAllSections();
+      showToast('数据已从云端同步');
+    }
+  } catch (e) {
+    reportSyncError(e, 'Pull from cloud failed:');
+  } finally {
+    isSyncing = false;
+  }
+}
+
+// ========== Realtime / Polling ==========
+function handleVisibilitySync() {
+  if (document.visibilityState === 'visible' && canUseCloudSync()) {
+    clearTimeout(pullTimer);
+    pullTimer = setTimeout(() => pullFromCloud(), 500);
+  }
+}
+
+function handleFocusSync() {
+  if (canUseCloudSync()) {
+    clearTimeout(pullTimer);
+    pullTimer = setTimeout(() => pullFromCloud(), 500);
+  }
+}
+
+function startSyncListeners() {
+  stopSyncListeners();
+  if (!canUseCloudSync()) return;
+
+  syncChannel = supabaseClient
+    .channel(`user-data-${currentUser.id}`)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'user_data',
+      filter: `user_id=eq.${currentUser.id}`
+    }, () => {
+      if (!canUseCloudSync()) return;
+      clearTimeout(pullTimer);
+      pullTimer = setTimeout(() => pullFromCloud(), 600);
+    })
+    .subscribe(status => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('Realtime 连接异常，轮询同步仍然可用');
+      }
+    });
+
+  document.addEventListener('visibilitychange', handleVisibilitySync);
+  window.addEventListener('focus', handleFocusSync);
+
+  clearInterval(pollTimer);
+  pollTimer = setInterval(() => {
+    if (document.visibilityState === 'visible' && canUseCloudSync()) pullFromCloud();
+  }, 60000);
+}
+
+function stopSyncListeners() {
+  if (syncChannel && supabaseClient) {
+    try { supabaseClient.removeChannel(syncChannel); } catch {}
+  }
+  syncChannel = null;
+  clearTimeout(pullTimer);
+  clearInterval(pollTimer);
+  pollTimer = null;
+  document.removeEventListener('visibilitychange', handleVisibilitySync);
+  window.removeEventListener('focus', handleFocusSync);
+}
+
+
+// ========== Theme ==========
+function applyTheme(theme) {
+  const next = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  safeSetItem('theme', next, true);
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  applyTheme(isDark ? 'light' : 'dark');
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+  applyTheme(saved);
+}
+
+// ========== Cover Image ==========
+function handleCoverFile(input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+  if (!/^image\//i.test(file.type)) {
+    showToast('请选择图片文件');
+    return;
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    showToast('图片超过 20 MB，请先压缩后再导入');
+    return;
+  }
+
+  compressImage(file, 500, 0.72).then(dataUrl => {
+    if (!dataUrl || dataUrl.length > 1500000) {
+      showToast('压缩后的图片仍然过大，请换一张');
+      return;
+    }
+    document.getElementById('form-cover').value = dataUrl;
+    showCoverPreview(dataUrl);
+    showToast('图片已导入 ✓');
+  }).catch(() => {
+    showToast('图片导入失败');
+  });
+}
+
+function compressImage(file, maxW, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.naturalWidth || img.width;
+        let h = img.naturalHeight || img.height;
+        if (!w || !h) { reject(new Error('invalid image')); return; }
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('canvas unavailable')); return; }
+        // 通过 canvas 重新编码，同时去掉 EXIF 等元数据
+        ctx.drawImage(img, 0, 0, w, h);
+        try {
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function showCoverPreview(url) {
+  const preview = document.getElementById('cover-preview');
+  const src = safeImgSrc(url);
+  if (!src) { preview.classList.remove('show'); preview.innerHTML = ''; return; }
+  preview.innerHTML = `<img src="${src}"><div class="cover-preview-actions"><button class="cover-remove" onclick="removeCoverPreview()">✕ 移除图片</button></div>`;
+  preview.classList.add('show');
+}
+
+function removeCoverPreview() {
+  document.getElementById('form-cover').value = '';
+  showCoverPreview('');
+}
+
+// ========== Sidebar Toggle ==========
+function toggleSidebar(section) {
+  const sidebar = document.getElementById(`sidebar-${section}`);
+  const card = sidebar.querySelector('.sidebar-card');
+  const btn = sidebar.previousElementSibling;
+  const isOpen = card.classList.contains('mobile-show');
+  if (isOpen) {
+    card.classList.remove('mobile-show');
+    btn.textContent = '🏷️ 标签分类 ▾';
+  } else {
+    card.classList.add('mobile-show');
+    btn.textContent = '🏷️ 标签分类 ▴';
+  }
+}
+
+// ========== Tab Navigation ==========
+function initTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchSection(btn.dataset.section));
+  });
+}
+
+function switchSection(section) {
+  currentSection = section;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.section === section));
+  document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.dataset.section === section));
+  renderSection(section);
+}
+
+// ========== Toast ==========
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ========== UUID ==========
+function uuid() {
+  // 优先用浏览器的加密安全随机 ID，避免跨设备合并时 id 撞车
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  return 'xxxx-xxxx-xxxx'.replace(/x/g, () => (Math.random() * 16 | 0).toString(16));
+}
+
+// ========== 输出转义（防 XSS） ==========
+// 所有来自用户输入或云端的数据，插入 HTML 前都必须经过这里
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// 生成安全的内联 onclick：先用 JSON.stringify 转义成 JS 字符串，再整体做 HTML 转义
+function onclickAttr(fnName, ...args) {
+  const js = fnName + '(' + args.map(a =>
+    (a === null || a === undefined) ? 'null' : JSON.stringify(String(a))
+  ).join(', ') + ')';
+  return escapeHtml(js);
+}
+
+// 只允许 http(s) 和 base64 图片，挡掉 javascript:、data:text/html 等危险协议
+function safeUrl(url) {
+  const s = String(url ?? '').trim();
+  if (/^https?:\/\//i.test(s)) return s;
+  if (/^data:image\/(png|jpe?g|gif|webp|avif);base64,[A-Za-z0-9+/=\s]+$/i.test(s)) return s;
+  return '';
+}
+
+function safeImgSrc(url) {
+  return escapeHtml(safeUrl(url));
+}
+
+// ========== Rating Helpers ==========
+function renderStars(rating) {
+  const full = Math.floor(rating / 2);
+  const half = rating % 2 >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return '★'.repeat(full) + (half ? '⯪' : '') + '☆'.repeat(empty);
+}
+
+function updateRatingDisplay() {
+  const val = document.getElementById('form-rating').value;
+  document.getElementById('form-rating-display').textContent = parseFloat(val).toFixed(1);
+}
+
+// ========== Render Section ==========
+function renderSection(section) {
+  renderTags(section);
+  renderCards(section);
+  updateCounts();
+}
+
+function updateCounts() {
+  SECTIONS.forEach(s => {
+    const data = getData(s);
+    document.getElementById(`count-${s}`).textContent = data.length;
+  });
+}
+
+// ========== Tags ==========
+function renderTags(section) {
+  const tags = getTags(section);
+  const container = document.getElementById(`tags-${section}`);
+  if (!container) return;
+
+  const active = activeTagFilter[section];
+  let html = `<div class="tag-item ${!active ? 'active' : ''}" onclick="${onclickAttr('filterByTag', section, null)}">全部</div>`;
+  tags.forEach(t => {
+    // 阻止冒泡 + 删除标签，需要两句 JS，单独拼好再整体转义
+    const stopAndDelete = escapeHtml(
+      'event.stopPropagation();' +
+      `deleteTag(${JSON.stringify(section)}, ${JSON.stringify(String(t))})`
+    );
+    html += `<div class="tag-item ${active === t ? 'active' : ''}" onclick="${onclickAttr('filterByTag', section, t)}">
+      ${escapeHtml(t)}
+      <button class="tag-delete" onclick="${stopAndDelete}">×</button>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function filterByTag(section, tag) {
+  activeTagFilter[section] = tag;
+  renderTags(section);
+  renderCards(section);
+}
+
+function openTagModal(section) {
+  currentTagSection = section;
+  document.getElementById('new-tag-input').value = '';
+  renderTagModalList();
+  document.getElementById('tagModal').classList.add('show');
+  setTimeout(() => document.getElementById('new-tag-input').focus(), 100);
+}
+
+function closeTagModal() {
+  document.getElementById('tagModal').classList.remove('show');
+  if (currentTagSection) {
+    renderTags(currentTagSection);
+    renderCards(currentTagSection);
+  }
+}
+
+function renderTagModalList() {
+  const tags = getTags(currentTagSection);
+  const container = document.getElementById('tag-modal-list');
+  container.innerHTML = tags.map(t => `
+    <div class="tag-item">
+      ${escapeHtml(t)}
+      <button class="tag-delete" onclick="${onclickAttr('deleteTag', currentTagSection, t)}">×</button>
+    </div>
+  `).join('') || '<div style="text-align:center;color:var(--text-muted);padding:20px;">暂无标签</div>';
+}
+
+function addTag() {
+  const input = document.getElementById('new-tag-input');
+  if (!input) return;
+  const name = input.value.trim().slice(0, 40);
+  if (!name) return;
+  const tags = getTags(currentTagSection);
+  if (tags.includes(name)) { showToast('标签已存在'); return; }
+  tags.push(name);
+  if (!setTags(currentTagSection, tags)) return;
+  input.value = '';
+  renderTagModalList();
+  showToast(`标签「${name}」已添加`);
+}
+
+function deleteTag(section, tag) {
+  const tags = getTags(section);
+  if (!tags.includes(tag)) return;
+  if (!setTags(section, tags.filter(t => t !== tag))) return;
+
+  // 只更新真正使用了该标签的作品，避免为整个板块制造无意义的 updatedAt
+  const data = getData(section);
+  const now = Date.now();
+  let changedCount = 0;
+  data.forEach(item => {
+    if (!Array.isArray(item.tags) || !item.tags.includes(tag)) return;
+    item.tags = item.tags.filter(t => t !== tag);
+    item.updatedAt = now;
+    changedCount++;
+  });
+  if (changedCount > 0 && !setData(section, data)) {
+    showToast('标签已删除，但部分作品的修改未能保存');
+  }
+
+  if (activeTagFilter[section] === tag) activeTagFilter[section] = null;
+  if (currentTagSection === section && document.getElementById('tagModal')?.classList.contains('show')) {
+    renderTagModalList();
+  }
+  renderTags(section);
+  renderCards(section);
+  showToast(`标签「${tag}」已删除`);
+}
+
+// ========== Cards ==========
+function renderCards(section) {
+  const data = getData(section);
+  const filter = activeTagFilter[section];
+  const container = document.getElementById(`grid-${section}`);
+
+  let filtered = data;
+  if (filter) {
+    filtered = data.filter(item => (item.tags || []).includes(filter));
+  }
+
+  // Sort by rating descending
+  filtered.sort((a, b) => sanitizeRating(b.rating) - sanitizeRating(a.rating));
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">${SECTION_ICONS[section]}</div><div class="text">还没有${SECTION_LABELS[section]}作品，快去添加吧！</div></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((item, idx) => {
+    const rank = idx + 1;
+    const rating = sanitizeRating(item.rating);
+    const cover = safeImgSrc(item.coverUrl);
+    const coverHtml = cover
+      ? `<img class="card-cover" src="${cover}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=card-cover-placeholder>${SECTION_ICONS[section]}</div>'">`
+      : `<div class="card-cover-placeholder">${SECTION_ICONS[section]}</div>`;
+    const itemTags = Array.isArray(item.tags) ? item.tags : [];
+    const itemKeywords = Array.isArray(item.keywordTags) ? item.keywordTags : [];
+    const tagsHtml = itemTags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('');
+    const keywordsHtml = itemKeywords.map(t => `<span class="keyword-tag">#${escapeHtml(t)}</span>`).join('');
+    return `<div class="card" onclick="${onclickAttr('openDetail', section, item.id)}">
+      <div class="card-rank ${rank <= 3 ? 'top3' : ''}">${rank}</div>
+      ${coverHtml}
+      <div class="card-body">
+        <div class="card-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
+        <div class="card-meta">${escapeHtml(item.author || '未知')} · ${escapeHtml(item.country || '未知')}</div>
+        <div class="card-rating">
+          <span class="stars">${renderStars(rating)}</span>
+          <span class="score">${rating.toFixed(1)}</span>
+        </div>
+        <div class="card-tags">${tagsHtml}</div>
+        ${keywordsHtml ? `<div class="keyword-tags">${keywordsHtml}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ========== Add/Edit Modal ==========
+function openAddModal(section, editId) {
+  currentSection = section;
+  currentEditId = editId || null;
+  const isEdit = !!editId;
+
+  document.getElementById('addModalTitle').textContent = isEdit ? '编辑作品' : `添加${SECTION_LABELS[section]}`;
+  document.getElementById('form-author-label').textContent = SECTION_AUTHOR_LABELS[section] || '作者';
+  document.getElementById('form-submit-btn').textContent = isEdit ? '✓ 保存' : '✓ 添加';
+
+  // Conditional field visibility
+  const authorGroup = document.getElementById('form-author').closest('.form-group');
+  const countryGroup = document.getElementById('form-country').closest('.form-group');
+  authorGroup.style.display = section === 'musicals' ? 'none' : '';
+  countryGroup.style.display = section === 'fanfiction' ? 'none' : '';
+
+  // Update placeholder by section
+  const authorPlaceholder = { movies: '输入导演', books: '输入作者', fanfiction: '输入大大名字', webnovels: '输入作者' };
+  document.getElementById('form-author').placeholder = authorPlaceholder[section] || '输入作者';
+
+  // Populate tags
+  const tags = getTags(section);
+  const item = isEdit ? getData(section).find(i => i.id === editId) : null;
+  const selectedTags = item ? (item.tags || []) : [];
+
+  document.getElementById('form-tags').innerHTML = tags.map(t =>
+    `<div class="tag-chip ${selectedTags.includes(t) ? 'selected' : ''}" onclick="this.classList.toggle('selected')" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</div>`
+  ).join('') || '<span style="color:var(--text-muted);font-size:13px;">暂无标签，请先在左侧创建</span>';
+
+  // Fill form
+  document.getElementById('form-title').value = item ? item.title : '';
+  document.getElementById('form-author').value = item ? item.author : '';
+  document.getElementById('form-country').value = item ? item.country : '';
+  document.getElementById('form-cover').value = item ? (item.coverUrl || '') : '';
+  showCoverPreview(item ? (item.coverUrl || '') : '');
+  document.getElementById('form-rating').value = item ? sanitizeRating(item.rating) : 0;
+  document.getElementById('form-review').value = item ? (item.review || '') : '';
+  document.getElementById('form-keywords').value = item ? (item.keywordTags || []).join(', ') : '';
+  document.getElementById('form-intro').value = item ? (item.intro || '') : '';
+  updateRatingDisplay();
+
+  // 预填充作者推荐列表（本地历史）
+  preloadAuthorSuggestions();
+
+  document.getElementById('addModal').classList.add('show');
+  setTimeout(() => document.getElementById('form-title').focus(), 100);
+}
+
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('show');
+  currentEditId = null;
+}
+
+function submitForm() {
+  const title = sanitizeString(document.getElementById('form-title').value, 200).trim();
+  if (!title) { showToast('请输入作品名称'); return; }
+
+  const editId = currentEditId;
+  const wasEditing = !!editId;
+  const now = Date.now();
+
+  const selectedTags = [];
+  document.querySelectorAll('#form-tags .tag-chip.selected').forEach(el => {
+    selectedTags.push(el.dataset.tag);
+  });
+
+  const keywordTagsRaw = document.getElementById('form-keywords').value;
+  const keywordTags = keywordTagsRaw
+    ? sanitizeTagList(keywordTagsRaw.split(/[,，]/), 40, 30, true)
+    : [];
+
+  const item = {
+    id: editId || uuid(),
+    title,
+    author: sanitizeString(document.getElementById('form-author').value, 100).trim(),
+    country: sanitizeString(document.getElementById('form-country').value, 60).trim(),
+    coverUrl: safeUrl(sanitizeString(document.getElementById('form-cover').value, 1500000).trim()),
+    rating: sanitizeRating(document.getElementById('form-rating').value),
+    review: sanitizeString(document.getElementById('form-review').value, 5000).trim(),
+    keywordTags,
+    intro: sanitizeString(document.getElementById('form-intro').value, 1000).trim(),
+    tags: selectedTags,
+    createdAt: now,
+    updatedAt: now
+  };
+
+  const data = getData(currentSection);
+  if (wasEditing) {
+    const idx = data.findIndex(i => i.id === editId);
+    if (idx >= 0) {
+      item.createdAt = sanitizeTimestamp(data[idx].createdAt) || now;
+      data[idx] = item;
+    } else {
+      data.push(item);
+    }
+  } else {
+    data.push(item);
+  }
+
+  if (!setData(currentSection, data)) return;
+
+  // 只在保存成功后记录作者到本地历史（自动推荐的来源之一）
+  recordAuthorFromForm(currentSection);
+
+  closeAddModal();
+  renderSection(currentSection);
+  showToast(wasEditing ? '作品已更新 ✓' : `「${title}」已添加 ✓`);
+}
+
+// ========== Detail Modal ==========
+function openDetail(section, id) {
+  const item = getData(section).find(i => i.id === id);
+  if (!item) return;
+
+  const cover = safeImgSrc(item.coverUrl);
+  const coverHtml = cover
+    ? `<img class="detail-cover" src="${cover}" decoding="async" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=detail-cover-placeholder>${SECTION_ICONS[section]}</div>'">`
+    : `<div class="detail-cover-placeholder">${SECTION_ICONS[section]}</div>`;
+
+  const rating = sanitizeRating(item.rating);
+  const itemTags = Array.isArray(item.tags) ? item.tags : [];
+  const itemKeywords = Array.isArray(item.keywordTags) ? item.keywordTags : [];
+  const tagsHtml = itemTags.map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--text-muted)">无标签</span>';
+  const keywordsHtml = itemKeywords.map(t => `<span class="keyword-tag">#${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--text-muted)">无关键词</span>';
+
+  const introHtml = item.intro ? `<div class="detail-intro">「${escapeHtml(item.intro)}」</div>` : '';
+  const authorLabel = SECTION_AUTHOR_LABELS[section];
+  const metaParts = [];
+  if (authorLabel && item.author) metaParts.push(`<span>${escapeHtml(authorLabel)}：${escapeHtml(item.author)}</span>`);
+  if (item.country) metaParts.push(`<span>国家：${escapeHtml(item.country)}</span>`);
+  const metaHtml = metaParts.join('');
+
+  document.getElementById('detail-content').innerHTML = `
+    ${coverHtml}
+    <div class="detail-title">${escapeHtml(item.title)}</div>
+    ${introHtml}
+    ${metaHtml ? `<div class="detail-meta">${metaHtml}</div>` : ''}
+    <div class="detail-rating">
+      <span class="stars">${renderStars(rating)}</span>
+      <span class="score">${rating.toFixed(1)}</span>
+    </div>
+    <div class="detail-section-title">我的评价</div>
+    <div class="detail-review">${escapeHtml(item.review || '暂无评价')}</div>
+    <div class="detail-section-title">关键词标签</div>
+    <div class="detail-tags">${keywordsHtml}</div>
+    <div class="detail-section-title">分类标签</div>
+    <div class="detail-tags">${tagsHtml}</div>
+    <div class="detail-actions">
+      <button class="btn btn-primary btn-small" onclick="${escapeHtml(`closeDetailModal();openAddModal(${JSON.stringify(section)}, ${JSON.stringify(String(item.id))})`)}">✏️ 编辑</button>
+      <button class="btn btn-danger btn-small" onclick="${onclickAttr('deleteItem', section, item.id)}">🗑️ 删除</button>
+    </div>
+  `;
+
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeDetailModal() {
+  document.getElementById('detailModal').classList.remove('show');
+}
+
+function deleteItem(section, id) {
+  if (!confirm('确定要删除这个作品吗？')) return;
+  if (!recordDeletion(section, id)) {
+    showToast('删除记录未能保存，请检查本机存储空间');
+    return;
+  }
+  const data = getData(section).filter(i => i.id !== id);
+  if (!setData(section, data)) return;
+  closeDetailModal();
+  renderSection(section);
+  showToast('作品已删除');
+}
+
+// ========== Local Search ==========
+function debounceSearch(section) {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => searchLocal(section), 300);
+}
+
+function showSearchResults(section) {
+  const container = document.getElementById(`results-${section}`);
+  if (container.children.length > 0) container.classList.add('show');
+}
+
+document.addEventListener('click', (e) => {
+  SECTIONS.forEach(s => {
+    const wrapper = document.querySelector(`#section-${s} .search-wrapper`);
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById(`results-${s}`).classList.remove('show');
+    }
+  });
+});
+
+function searchLocal(section) {
+  const input = document.getElementById(`search-${section}`);
+  const query = input.value.trim().toLowerCase();
+  const container = document.getElementById(`results-${section}`);
+
+  if (!query) { container.innerHTML = ''; container.classList.remove('show'); return; }
+
+  const data = getData(section);
+
+  // Match items by title, author, or keyword tags
+  const matched = data.filter(item => {
+    const keywords = Array.isArray(item.keywordTags) ? item.keywordTags : [];
+    if (String(item.title || '').toLowerCase().includes(query)) return true;
+    if (String(item.author || '').toLowerCase().includes(query)) return true;
+    if (keywords.some(t => String(t).toLowerCase().includes(query))) return true;
+    return false;
+  }).slice(0, 8);
+
+  // Collect matching keyword tags
+  const allKeywordTags = {};
+  data.forEach(item => {
+    const keywords = Array.isArray(item.keywordTags) ? item.keywordTags : [];
+    keywords.forEach(tag => {
+      if (String(tag).toLowerCase().includes(query)) {
+        allKeywordTags[tag] = (allKeywordTags[tag] || 0) + 1;
+      }
+    });
+  });
+  const tagEntries = Object.entries(allKeywordTags).slice(0, 5);
+
+  let html = '';
+
+  if (matched.length === 0 && tagEntries.length === 0) {
+    html = '<div class="search-loading">未找到匹配作品</div>';
+  } else {
+    // Item results
+    matched.forEach(item => {
+      const coverSrc = safeImgSrc(item.coverUrl);
+      const cover = coverSrc
+        ? `<img src="${coverSrc}" loading="lazy" decoding="async" referrerpolicy="no-referrer" style="width:40px;height:56px;object-fit:cover;border-radius:4px;flex-shrink:0;">`
+        : `<div style="width:40px;height:56px;background:var(--bg-secondary);border-radius:4px;display:flex;align-items:center;justify-content:center;">${SECTION_ICONS[section]}</div>`;
+      const itemKeywords = Array.isArray(item.keywordTags) ? item.keywordTags : [];
+      const keywords = itemKeywords.slice(0, 3).map(t => `<span class="keyword-tag">#${escapeHtml(t)}</span>`).join('');
+      html += `<div class="search-result-item" onclick="${onclickAttr('openDetailFromSearch', section, item.id)}">
+        ${cover}
+        <div class="search-result-info">
+          <div class="title">${escapeHtml(item.title)}</div>
+          <div class="meta">${escapeHtml(item.author || '未知')} · ${escapeHtml(item.country || '')}</div>
+          ${keywords ? `<div style="margin-top:4px;">${keywords}</div>` : ''}
+        </div>
+      </div>`;
+    });
+
+    // Tag hints
+    tagEntries.forEach(([tag, count]) => {
+      html += `<div class="search-tag-hint" onclick="${onclickAttr('searchByTag', section, tag)}">
+        🏷️ <strong>#${escapeHtml(tag)}</strong> <span class="tag-count">(${Number(count) || 0}个作品)</span>
+      </div>`;
+    });
+  }
+
+  container.innerHTML = html;
+  container.classList.add('show');
+}
+
+function openDetailFromSearch(section, id) {
+  document.getElementById(`results-${section}`).classList.remove('show');
+  document.getElementById(`search-${section}`).value = '';
+  openDetail(section, id);
+}
+
+function searchByTag(section, tag) {
+  const input = document.getElementById(`search-${section}`);
+  input.value = tag;
+  searchLocal(section);
+}
+
+// ========== Close modals on overlay click ==========
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target !== overlay) return;
+    // 账号切换必须由用户明确选择“继续”或“取消”，不能被误点关闭
+    if (overlay.dataset.static === 'true') return;
+    if (overlay.id === 'syncModal') { closeSyncModal(); return; }
+    if (overlay.id === 'importModal') { closeImportModal(); return; }
+    overlay.classList.remove('show');
+  });
+});
+
+// ========== Keyboard shortcuts ==========
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  document.querySelectorAll('.modal-overlay.show').forEach(m => {
+    if (m.dataset.static === 'true') return;
+    if (m.id === 'syncModal') closeSyncModal();
+    else if (m.id === 'importModal') closeImportModal();
+    else m.classList.remove('show');
+  });
+});
+
+// ========== Init ==========
+function init() {
+  initTheme();
+  initTabs();
+  SECTIONS.forEach(s => renderSection(s));
+  updateCounts();
+  initSupabase();
+  updateSyncStatus();
+}
+
+// ========== Expose to global scope (for HTML onclick handlers) ==========
+Object.assign(window, {
+  toggleTheme, toggleSidebar, openAddModal, closeAddModal, submitForm,
+  openTagModal, closeTagModal, addTag, deleteTag, filterByTag,
+  debounceSearch, showSearchResults, openSyncModal, closeSyncModal,
+  loginSupabase, registerSupabase, logoutSupabase, syncNow,
+  showLoginPanel, showRegisterPanel, updateLoginState, updateRegisterState,
+  enableCloudSync, pauseCloudSync, resumeCloudSync, revokeCloudConsent, deleteCloudData,
+  updateCloudConsentState, saveExternalLookupSetting,
+  exportBackup, openImportPicker, handleBackupFile, updateImportState,
+  confirmImport, closeImportModal,
+  switchAccountWithBackup, cancelAccountSwitch,
+  handleCoverFile, removeCoverPreview, updateRatingDisplay,
+  openDetail, closeDetailModal, deleteItem,
+  openDetailFromSearch, searchByTag,
+  debounceAuthorSearch, saveTmdbApiKey
+});
+
+init();
+</script>
+</body>
+</html>
