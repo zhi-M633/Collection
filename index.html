@@ -1449,6 +1449,7 @@ textarea { resize: vertical; min-height: 80px; }
 <nav class="tab-nav">
   <div class="tab-list" id="tabList">
     <button class="tab-btn active" data-section="movies">🎬 电影 <span class="tab-count" id="count-movies">0</span></button>
+    <button class="tab-btn" data-section="tv">📺 电视剧 <span class="tab-count" id="count-tv">0</span></button>
     <button class="tab-btn" data-section="books">📚 书本 <span class="tab-count" id="count-books">0</span></button>
     <button class="tab-btn" data-section="musicals">🎭 音乐剧 <span class="tab-count" id="count-musicals">0</span></button>
     <button class="tab-btn" data-section="fanfiction">💕 同人文 <span class="tab-count" id="count-fanfiction">0</span></button>
@@ -1478,6 +1479,29 @@ textarea { resize: vertical; min-height: 80px; }
       </aside>
       <div class="content-area">
         <div class="cards-grid" id="grid-movies"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TV Series Section -->
+  <div class="section" id="section-tv" data-section="tv">
+    <div class="search-bar">
+      <div class="search-wrapper">
+        <input type="text" placeholder="搜索已收藏的电视剧..." id="search-tv" oninput="debounceSearch('tv')" onfocus="showSearchResults('tv')">
+        <div class="search-results" id="results-tv"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="openAddModal('tv')">+ 添加电视剧</button>
+    </div>
+    <div class="content-layout">
+      <button class="sidebar-toggle" onclick="toggleSidebar('tv')">🏷️ 标签分类 ▾</button>
+      <aside class="sidebar" id="sidebar-tv">
+        <div class="sidebar-card">
+          <div class="sidebar-title">标签分类 <button class="btn btn-small btn-secondary" onclick="openTagModal('tv')">+</button></div>
+          <div class="tag-list" id="tags-tv"></div>
+        </div>
+      </aside>
+      <div class="content-area">
+        <div class="cards-grid" id="grid-tv"></div>
       </div>
     </div>
   </div>
@@ -1817,7 +1841,7 @@ textarea { resize: vertical; min-height: 80px; }
         <p class="settings-hint">默认关闭。关闭时只使用本机作者历史，不会向第三方发送任何搜索词。开启后，输入作者名会发送给对应服务。</p>
         <div id="tmdb-settings" style="display:none;">
           <div class="form-group" style="margin-top:12px;">
-            <label>TMDB API Key（电影板块）</label>
+            <label>TMDB API Key（电影 / 电视剧板块）</label>
             <input type="text" id="tmdb-api-key-input" placeholder="从 TMDB 设置页面获取（免费）" maxlength="100">
           </div>
           <button class="btn btn-secondary modal-btn" style="width:100%;" onclick="saveTmdbApiKey()">保存 Key</button>
@@ -1965,13 +1989,15 @@ textarea { resize: vertical; min-height: 80px; }
 <script type="module">
 
 // ========== Constants ==========
-const SECTIONS = ['movies', 'books', 'musicals', 'fanfiction', 'webnovels'];
+const SECTIONS = ['movies', 'tv', 'books', 'musicals', 'fanfiction', 'webnovels'];
 const NOTEBOOK_SECTION = 'notes';
 // 笔记本与作品共用快照/合并/备份逻辑，但不参与标签系统
 const SYNC_SECTIONS = [...SECTIONS, NOTEBOOK_SECTION];
-const SECTION_LABELS = { movies: '电影', books: '书本', musicals: '音乐剧', fanfiction: '同人文', webnovels: '网文漫画' };
-const SECTION_ICONS = { movies: '🎬', books: '📚', musicals: '🎭', fanfiction: '💕', webnovels: '📖' };
-const SECTION_AUTHOR_LABELS = { movies: '导演', books: '作者', musicals: '', fanfiction: '大大', webnovels: '作者' };
+const SECTION_LABELS = { movies: '电影', tv: '电视剧', books: '书本', musicals: '音乐剧', fanfiction: '同人文', webnovels: '网文漫画' };
+const SECTION_ICONS = { movies: '🎬', tv: '📺', books: '📚', musicals: '🎭', fanfiction: '💕', webnovels: '📖' };
+const SECTION_AUTHOR_LABELS = { movies: '导演', tv: '导演', books: '作者', musicals: '', fanfiction: '大大', webnovels: '作者' };
+// 作者推荐使用 TMDB 人名的板块
+const TMDB_SECTIONS = new Set(['movies', 'tv']);
 
 // ========== 国家地区列表（静态，~40 个常见国家） ==========
 const COMMON_COUNTRIES = [
@@ -3973,7 +3999,7 @@ function closeImportModal() {
 }
 
 // ========== 作者自动推荐 ==========
-// 分板块知识库：电影 → TMDB，书本 → Open Library，其他 → 本地历史
+// 分板块知识库：电影 / 电视剧 → TMDB，书本 → Open Library，其他 → 本地历史
 // 本地历史在 submitForm 里自动累积，保存在 LocalStorage 中
 
 function getTmdbApiKey() {
@@ -3990,8 +4016,8 @@ function saveTmdbApiKey() {
   }
   if (!safeSetItem('tmdb_api_key', key)) return;
   showToast(key ? 'TMDB API Key 已保存' : 'TMDB API Key 已清除');
-  // 刷新电影板块的搜索缓存，下次输入立即可用
-  authorSuggestionCache.delete('movies');
+  // 刷新 TMDB 板块的搜索缓存，下次输入立即可用
+  TMDB_SECTIONS.forEach(s => authorSuggestionCache.delete(s));
 }
 
 function getExternalLookupEnabled() {
@@ -4009,7 +4035,7 @@ function updateExternalLookupUI() {
 function saveExternalLookupSetting(enabled) {
   if (enabled) {
     const ok = confirm(
-      '开启后，输入作者名时会把搜索词发送给 TMDB（电影）或 Open Library（书本）。' +
+      '开启后，输入作者名时会把搜索词发送给 TMDB（电影 / 电视剧）或 Open Library（书本）。' +
       '这些第三方服务会看到你的 IP 和搜索词。是否继续？'
     );
     if (!ok) {
@@ -4081,9 +4107,9 @@ async function searchAuthors(section, query) {
 
   // 外部查询必须由用户显式开启；默认只使用本机历史
   if (getExternalLookupEnabled()) {
-    // 电影板块：TMDB（需配置 API Key）
-    if (section === 'movies' && getTmdbApiKey()) {
-      const tmdbResults = await fetchTmdbPersons(query);
+    // 电影 / 电视剧板块：TMDB（需配置 API Key）
+    if (TMDB_SECTIONS.has(section) && getTmdbApiKey()) {
+      const tmdbResults = await fetchTmdbPersons(query, section);
       suggestions = [...new Set([...local, ...tmdbResults])];
     }
     // 书本板块：Open Library（免 API Key）
@@ -4098,10 +4124,9 @@ async function searchAuthors(section, query) {
   }
 }
 
-async function fetchTmdbPersons(query) {
+async function fetchTmdbPersons(query, section) {
   const key = getTmdbApiKey();
   if (!key || !getExternalLookupEnabled()) return [];
-  const section = 'movies';
   let controller = null;
   try {
     // 用 AbortController 处理连续输入：新的搜索会取消旧的
@@ -4724,7 +4749,7 @@ function openAddModal(section, editId) {
   countryGroup.style.display = section === 'fanfiction' ? 'none' : '';
 
   // Update placeholder by section
-  const authorPlaceholder = { movies: '输入导演', books: '输入作者', fanfiction: '输入大大名字', webnovels: '输入作者' };
+  const authorPlaceholder = { movies: '输入导演', tv: '输入导演', books: '输入作者', fanfiction: '输入大大名字', webnovels: '输入作者' };
   document.getElementById('form-author').placeholder = authorPlaceholder[section] || '输入作者';
 
   // Populate tags
